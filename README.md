@@ -63,7 +63,7 @@ Node.js 是运行本系统的基础环境，必须安装。
 
 ```
 poetry-system/                 # 根目录
-├── poetry-system/             # 项目目录（重要：在此目录下运行命令）
+├── src/                       # 项目目录（重要：在此目录下运行命令）
 │   ├── node_modules/          # 依赖包文件夹（如有）
 │   ├── public/                # 静态资源
 │   │   └── 题库.json          # 题目数据
@@ -86,7 +86,7 @@ poetry-system/                 # 根目录
 2. 在地址栏输入 `cmd`，按回车（在当前目录打开命令提示符）
 3. 进入项目子目录：
    ```cmd
-   cd poetry-system
+   cd src
    ```
 
 ### 2.3 安装项目依赖
@@ -106,7 +106,7 @@ poetry-system/                 # 根目录
 
 ### 3.1 启动开发服务器
 
-1. 确保已在项目子目录 `poetry-system` 中（命令提示符路径应显示 `...\poetry-system\poetry-system>`）
+1. 确保已在项目子目录 `src` 中（命令提示符路径应显示 `...\poetry-system\src>`）
 2. 输入以下命令启动系统：
    ```cmd
    npm run dev
@@ -267,7 +267,7 @@ npm install
 
 **解决方案**：确保已进入项目子目录
 ```cmd
-cd poetry-system
+cd src
 npm install
 npm run dev
 ```
@@ -413,7 +413,7 @@ node --version
 npm --version
 
 # 进入项目子目录（重要！）
-cd poetry-system
+cd src
 
 # 安装依赖
 npm install
@@ -432,7 +432,7 @@ npm run dev -- --port 3000
 
 ```
 poetry-system/                    # 根目录（README 所在目录）
-├── poetry-system/                # 项目子目录（在此运行 npm 命令）
+├── src/                          # 项目子目录（在此运行 npm 命令）
 │   ├── public/                   # 静态资源
 │   │   └── 题库.json             # 题目数据（可编辑）
 │   ├── src/
