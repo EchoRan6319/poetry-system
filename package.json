@@ -1,0 +1,9 @@
+{
+  "name": "诗词大会项目",
+  "scripts": {
+    "install": "cd poetry-system && npm install",
+    "dev": "cd poetry-system && npm run dev",
+    "build": "cd poetry-system && npm run build",
+    "preview": "cd poetry-system && npm run preview"
+  }
+}
