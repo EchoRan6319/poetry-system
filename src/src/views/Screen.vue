@@ -1,24 +1,24 @@
 <template>
-  <div class="min-h-screen overflow-hidden bg-zinc-900 grid-bg">
+  <div class="min-h-screen overflow-hidden bg-paper grid-bg">
     <header class="fixed left-0 right-0 top-0 z-50 px-12 py-6">
-      <div class="flex items-center justify-between">
+      <div class="flex items-center justify-between gap-6">
         <div class="flex items-center gap-4">
-          <div class="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 shadow-lg shadow-cyan-500/30">
+          <div class="brand-seal flex h-16 w-16 items-center justify-center rounded-full">
             <span class="text-3xl">诗</span>
           </div>
           <div>
             <h1 class="text-4xl font-bold text-gold-gradient text-shadow-lg">传承经典</h1>
-            <p class="text-lg tracking-widest text-cyan-400">诗词大赛</p>
+            <p class="text-lg tracking-widest text-cyan-gradient">诗词大赛</p>
           </div>
         </div>
 
         <div class="glass-card px-12 py-4">
-          <span class="text-2xl font-semibold text-cyan-300">{{ currentStage || '准备就绪' }}</span>
+          <span class="text-2xl font-semibold text-green">{{ currentStage || '准备就绪' }}</span>
         </div>
 
-        <div class="glass-card min-w-[200px] px-8 py-4 text-center">
-          <div class="mb-1 text-sm text-zinc-400">剩余时间</div>
-          <div class="font-mono text-5xl font-bold transition-colors" :class="timerClass">
+        <div class="glass-card min-w-[220px] px-8 py-4 text-center">
+          <div class="mb-1 text-sm text-ink-soft">剩余时间</div>
+          <div class="data-number text-5xl font-bold transition-colors" :class="timerClass">
             {{ formatTime(timer.remaining) }}
           </div>
         </div>
@@ -28,14 +28,14 @@
     <main class="flex min-h-screen flex-col justify-center px-12 pb-32 pt-40">
       <div class="flex flex-1 items-center justify-center">
         <div v-if="!currentQuestion" class="text-center">
-          <div class="mb-8 text-8xl">待命</div>
-          <h2 class="mb-4 text-5xl font-bold text-zinc-300">等待比赛开始</h2>
-          <p class="text-2xl text-zinc-500">请使用导播控制台同步题目</p>
+          <div class="mb-8 text-8xl text-gold">待命</div>
+          <h2 class="mb-4 text-5xl font-bold text-ink-strong">等待比赛开始</h2>
+          <p class="text-2xl text-ink-soft">请使用导播控制台同步题目</p>
         </div>
 
         <div v-else class="w-full max-w-6xl">
           <div class="mb-12 text-center">
-            <span class="glass-card inline-block px-8 py-3 text-xl text-cyan-300">
+            <span class="glass-card inline-block px-8 py-3 text-xl text-green">
               {{ currentQuestion.rule }}
             </span>
           </div>
@@ -52,7 +52,7 @@
                 <div
                   v-for="(char, index) in gridChars"
                   :key="`${char}-${index}`"
-                  class="glass-card flex h-20 w-20 items-center justify-center border-2 border-cyan-500/30 text-5xl text-zinc-200 transition-colors hover:border-cyan-400/60"
+                  class="glass-card flex h-20 w-20 items-center justify-center border-2 border-gold/25 text-5xl text-ink-strong transition-colors hover:border-green/40"
                 >
                   {{ char }}
                 </div>
@@ -60,41 +60,41 @@
             </div>
 
             <div v-else-if="currentQuestion.stage === '易错找茬'" class="text-center">
-              <div class="text-6xl leading-relaxed text-zinc-200">
+              <div class="text-6xl leading-relaxed text-ink-strong">
                 {{ currentQuestion.question }}
               </div>
-              <div class="mt-8 text-2xl text-cyan-400">请找出其中的错别字</div>
+              <div class="mt-8 text-2xl text-green">请找出其中的错别字</div>
             </div>
 
             <div v-else-if="currentQuestion.stage === '中原风华'" class="text-center">
-              <div class="text-5xl leading-relaxed text-zinc-200">
+              <div class="text-5xl leading-relaxed text-ink-strong">
                 {{ currentQuestion.question }}
               </div>
             </div>
 
             <div v-else-if="currentQuestion.stage === '经典填词'" class="text-center">
-              <div class="text-6xl leading-relaxed tracking-widest text-zinc-200">
+              <div class="text-6xl leading-relaxed tracking-widest text-ink-strong">
                 {{ currentQuestion.question }}
               </div>
             </div>
 
             <div v-else-if="currentQuestion.stage === '主题飞花令'" class="text-center">
-              <div class="mb-8 text-4xl text-cyan-400">主题</div>
+              <div class="mb-8 text-4xl text-green">主题</div>
               <div class="text-8xl font-bold text-gold-gradient">
                 {{ currentQuestion.question }}
               </div>
             </div>
 
             <div v-else class="text-center">
-              <div class="text-6xl leading-relaxed text-zinc-200">
+              <div class="text-6xl leading-relaxed text-ink-strong">
                 {{ currentQuestion.question }}
               </div>
             </div>
           </div>
 
-          <div v-if="isAnswerRevealed" class="glass-card border-yellow-500/30 bg-yellow-500/5 p-8">
+          <div v-if="isAnswerRevealed" class="glass-card border-gold/30 bg-gold/10 p-8">
             <div class="text-center">
-              <div class="mb-2 text-sm text-yellow-500">正确答案</div>
+              <div class="mb-2 text-sm text-gold">正确答案</div>
               <div class="text-5xl text-gold-gradient">
                 {{ currentQuestion.answer }}
               </div>
@@ -106,27 +106,27 @@
 
     <footer class="fixed bottom-0 left-0 right-0 px-4 py-3">
       <div class="glass-card px-4 py-3">
-        <div class="flex items-center justify-between gap-2 overflow-x-auto">
+        <div
+          ref="teamScrollRef"
+          class="no-scrollbar flex items-center justify-between gap-2 overflow-x-auto"
+          @wheel.prevent="handleTeamScroll"
+        >
           <div
             v-for="team in teams"
             :key="team.id"
-            class="min-w-fit rounded-lg bg-zinc-800/50 px-3 py-2"
+            class="min-w-fit rounded-lg bg-paper-soft/70 px-3 py-2"
           >
             <div class="flex items-center gap-2">
-              <div class="whitespace-nowrap text-sm text-zinc-400">{{ team.name }}</div>
-              <div class="text-2xl font-bold text-cyan-400">{{ team.score }}</div>
+              <div class="whitespace-nowrap text-sm text-ink-soft">{{ team.name }}</div>
+              <div class="data-number text-2xl font-bold text-green">{{ team.score }}</div>
             </div>
           </div>
         </div>
       </div>
     </footer>
 
-    <div class="fixed bottom-4 right-4 z-50 text-sm text-zinc-600">
-      Powered by College of Information Engineering and Big Data
-    </div>
-
     <div class="fixed right-6 top-6 z-50">
-      <div class="h-3 w-3 rounded-full" :class="isConnected ? 'bg-green-500 animate-pulse' : 'bg-yellow-500'"></div>
+      <div class="h-3 w-3 rounded-full" :class="isConnected ? 'bg-green animate-breathe' : 'bg-gold'"></div>
     </div>
   </div>
 </template>
@@ -140,6 +140,7 @@ const isConnected = ref(false)
 const currentQuestion = ref(null)
 const currentStage = ref('')
 const isAnswerRevealed = ref(false)
+const teamScrollRef = ref(null)
 const timer = ref({
   isRunning: false,
   remaining: 0,
@@ -160,10 +161,10 @@ const getDefaultTimer = (seconds = 0) => ({
 })
 
 const timerClass = computed(() => {
-  if (!timer.value.isRunning) return 'text-zinc-500'
-  if (timer.value.remaining <= 5) return 'text-red-500 animate-pulse'
-  if (timer.value.remaining <= 10) return 'text-yellow-400'
-  return 'text-cyan-400'
+  if (!timer.value.isRunning) return 'text-ink-soft'
+  if (timer.value.remaining <= 5) return 'text-red animate-breathe'
+  if (timer.value.remaining <= 10) return 'text-gold'
+  return 'text-green'
 })
 
 const gridChars = computed(() => {
@@ -184,6 +185,15 @@ const formatTime = (seconds) => {
   const mins = Math.floor(safeSeconds / 60)
   const secs = safeSeconds % 60
   return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
+}
+
+const handleTeamScroll = (event) => {
+  if (!teamScrollRef.value) {
+    return
+  }
+
+  const delta = Math.abs(event.deltaY) > Math.abs(event.deltaX) ? event.deltaY : event.deltaX
+  teamScrollRef.value.scrollLeft += delta
 }
 
 const saveState = () => {
@@ -348,6 +358,6 @@ onUnmounted(() => {
 
 <style scoped>
 .font-emoji {
-  font-family: 'Noto Color Emoji', sans-serif;
+  font-family: "Noto Color Emoji", sans-serif;
 }
 </style>

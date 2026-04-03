@@ -1,15 +1,15 @@
 <template>
-  <div class="min-h-screen bg-zinc-900 grid-bg p-6">
+  <div class="min-h-screen bg-paper grid-bg p-6">
     <header class="mb-6">
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-3xl font-bold text-gold-gradient">传承经典 · 导播控制台</h1>
-          <p class="mt-1 text-zinc-400">诗词大赛双屏互动系统 - 管理端</p>
+          <p class="mt-1 text-ink-soft">诗词大赛双屏互动系统 - 管理端</p>
         </div>
         <div class="flex items-center gap-4">
           <div class="glass-card flex items-center gap-2 px-4 py-2">
-            <div class="h-2 w-2 rounded-full" :class="isConnected ? 'bg-green-500' : 'bg-yellow-500'"></div>
-            <span class="text-sm text-zinc-300">{{ isConnected ? 'BroadcastChannel 正常' : '已切换本地兜底同步' }}</span>
+            <div class="h-2 w-2 rounded-full" :class="isConnected ? 'bg-green' : 'bg-gold'"></div>
+            <span class="text-sm text-ink">{{ isConnected ? 'BroadcastChannel 正常' : '已切换本地兜底同步' }}</span>
           </div>
           <button @click="openScreenWindow" class="btn-primary text-sm">
             打开大屏端
@@ -21,46 +21,46 @@
     <div class="grid grid-cols-12 gap-6">
       <div class="col-span-4 space-y-4">
         <div class="glass-card p-4">
-          <h2 class="mb-4 text-lg font-semibold text-cyan-400">题目列表</h2>
+          <h2 class="mb-4 text-lg font-semibold text-green">题目列表</h2>
           <div class="max-h-[400px] space-y-2 overflow-y-auto">
             <div
               v-for="(question, index) in questions"
               :key="question.id"
               class="cursor-pointer rounded-lg p-3 transition-all"
-              :class="currentQuestion?.id === question.id ? 'border border-cyan-500/50 bg-cyan-500/20' : 'bg-zinc-800/50 hover:bg-zinc-800'"
+              :class="currentQuestion?.id === question.id ? 'border border-gold/40 bg-gold/10' : 'bg-paper-soft/60 hover:bg-paper-soft/90'"
               @click="selectQuestion(question)"
             >
               <div class="flex items-center justify-between">
-                <span class="text-sm font-medium text-zinc-200">{{ index + 1 }}. {{ question.stage }}</span>
-                <span class="text-xs text-zinc-500">{{ question.time_limit }}s</span>
+                <span class="text-sm font-medium text-ink-strong">{{ index + 1 }}. {{ question.stage }}</span>
+                <span class="text-xs text-ink-soft">{{ question.time_limit }}s</span>
               </div>
-              <p class="mt-1 truncate text-xs text-zinc-400">{{ question.question }}</p>
+              <p class="mt-1 truncate text-xs text-ink-soft">{{ question.question }}</p>
             </div>
           </div>
         </div>
 
         <div v-if="currentQuestion" class="glass-card p-4">
-          <h2 class="mb-4 text-lg font-semibold text-cyan-400">当前题目</h2>
+          <h2 class="mb-4 text-lg font-semibold text-green">当前题目</h2>
           <div class="space-y-3">
             <div>
-              <label class="text-xs text-zinc-500">题型</label>
-              <p class="text-sm text-zinc-200">{{ currentQuestion.stage }}</p>
+              <label class="text-xs text-ink-soft">题型</label>
+              <p class="text-sm text-ink-strong">{{ currentQuestion.stage }}</p>
             </div>
             <div>
-              <label class="text-xs text-zinc-500">规则说明</label>
-              <p class="text-sm text-zinc-200">{{ currentQuestion.rule }}</p>
+              <label class="text-xs text-ink-soft">规则说明</label>
+              <p class="text-sm text-ink-strong">{{ currentQuestion.rule }}</p>
             </div>
             <div>
-              <label class="text-xs text-zinc-500">题目内容</label>
-              <p class="font-emoji text-sm text-zinc-200">{{ currentQuestion.question }}</p>
+              <label class="text-xs text-ink-soft">题目内容</label>
+              <p class="font-emoji text-sm text-ink-strong">{{ currentQuestion.question }}</p>
             </div>
             <div>
-              <label class="text-xs text-zinc-500">标准答案</label>
+              <label class="text-xs text-ink-soft">标准答案</label>
               <p class="text-sm text-gold-gradient">{{ currentQuestion.answer }}</p>
             </div>
-            <div class="rounded-lg border border-yellow-500/30 bg-yellow-500/10 p-3">
-              <label class="text-xs text-yellow-500">主持人提示</label>
-              <p class="text-sm text-yellow-200">{{ currentQuestion.key_point }}</p>
+            <div class="rounded-lg border border-gold/30 bg-gold/10 p-3">
+              <label class="text-xs text-gold">主持人提示</label>
+              <p class="text-sm text-ink">{{ currentQuestion.key_point }}</p>
             </div>
           </div>
         </div>
@@ -68,10 +68,10 @@
 
       <div class="col-span-5 space-y-4">
         <div class="glass-card p-6">
-          <h2 class="mb-6 text-lg font-semibold text-cyan-400">控制面板</h2>
+          <h2 class="mb-6 text-lg font-semibold text-green">控制面板</h2>
 
           <div class="mb-6">
-            <h3 class="mb-3 text-sm font-medium text-zinc-400">题目控制</h3>
+            <h3 class="mb-3 text-sm font-medium text-ink-soft">题目控制</h3>
             <div class="flex gap-3">
               <button
                 @click="syncToScreen"
@@ -91,7 +91,7 @@
           </div>
 
           <div class="mb-6">
-            <h3 class="mb-3 text-sm font-medium text-zinc-400">倒计时控制</h3>
+            <h3 class="mb-3 text-sm font-medium text-ink-soft">倒计时控制</h3>
             <div class="mb-3 flex gap-3">
               <button
                 @click="startTimer"
@@ -109,14 +109,14 @@
               </button>
             </div>
             <div class="glass-card p-4 text-center">
-              <span class="font-mono text-4xl font-bold" :class="timer.isRunning ? 'text-cyan-400' : 'text-zinc-500'">
+              <span class="data-number text-4xl font-bold" :class="timer.isRunning ? 'text-green' : 'text-ink-soft'">
                 {{ formatTime(timer.remaining) }}
               </span>
             </div>
           </div>
 
           <div class="mb-6">
-            <h3 class="mb-3 text-sm font-medium text-zinc-400">答案控制</h3>
+            <h3 class="mb-3 text-sm font-medium text-ink-soft">答案控制</h3>
             <button
               @click="revealAnswer"
               :disabled="!currentQuestion || isAnswerRevealed"
@@ -127,15 +127,15 @@
           </div>
 
           <div>
-            <h3 class="mb-3 text-sm font-medium text-zinc-400">系统控制</h3>
+            <h3 class="mb-3 text-sm font-medium text-ink-soft">系统控制</h3>
             <div class="flex gap-3">
-              <button @click="resetScores" class="flex-1 rounded-lg bg-zinc-700 px-4 py-2 text-sm transition-colors hover:bg-zinc-600">
+              <button @click="resetScores" class="flex-1 rounded-lg bg-paper-soft px-4 py-2 text-sm text-ink transition-colors hover:bg-white">
                 重置分数
               </button>
-              <button @click="resetGame" class="flex-1 rounded-lg bg-red-900/70 px-4 py-2 text-sm transition-colors hover:bg-red-800">
+              <button @click="resetGame" class="flex-1 rounded-lg bg-red/10 px-4 py-2 text-sm text-red transition-colors hover:bg-red/20">
                 重置比赛
               </button>
-              <button @click="clearStorage" class="flex-1 rounded-lg bg-zinc-700 px-4 py-2 text-sm transition-colors hover:bg-zinc-600">
+              <button @click="clearStorage" class="flex-1 rounded-lg bg-paper-soft px-4 py-2 text-sm text-ink transition-colors hover:bg-white">
                 清除缓存
               </button>
             </div>
@@ -144,19 +144,19 @@
 
         <div class="glass-card p-6">
           <div class="mb-4 flex items-center justify-between">
-            <h2 class="text-lg font-semibold text-cyan-400">队伍管理</h2>
+            <h2 class="text-lg font-semibold text-green">队伍管理</h2>
             <div class="flex gap-2">
               <button
                 @click="addTeam"
                 :disabled="teams.length >= 12"
-                class="rounded bg-green-600 px-3 py-1 text-sm transition-colors hover:bg-green-500 disabled:cursor-not-allowed disabled:opacity-50"
+                class="rounded bg-green px-3 py-1 text-sm text-paper-soft transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 + 添加
               </button>
               <button
                 @click="removeTeam"
                 :disabled="teams.length <= 2"
-                class="rounded bg-red-600 px-3 py-1 text-sm transition-colors hover:bg-red-500 disabled:cursor-not-allowed disabled:opacity-50"
+                class="rounded bg-red px-3 py-1 text-sm text-paper-soft transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 - 减少
               </button>
@@ -166,25 +166,25 @@
           <div class="max-h-[400px] space-y-3 overflow-y-auto">
             <div v-for="(team, index) in teams" :key="team.id" class="glass-card p-3">
               <div class="flex items-center gap-3">
-                <span class="w-8 text-zinc-500">{{ index + 1 }}.</span>
-                <span class="flex-1 text-sm text-zinc-200">{{ team.name }}</span>
+                <span class="w-8 text-ink-soft">{{ index + 1 }}.</span>
+                <span class="flex-1 text-sm text-ink-strong">{{ team.name }}</span>
                 <div class="flex gap-2">
                   <button
                     @click="updateScore(team.id, -10)"
-                    class="h-8 w-10 rounded bg-red-500/20 text-red-400 transition-colors hover:bg-red-500/30"
+                    class="h-8 w-10 rounded bg-red/10 text-red transition-colors hover:bg-red/20"
                   >
                     -10
                   </button>
-                  <span class="w-12 text-center text-xl font-bold text-gold-gradient">{{ team.score }}</span>
+                  <span class="data-number w-12 text-center text-xl font-bold text-gold">{{ team.score }}</span>
                   <button
                     @click="updateScore(team.id, 10)"
-                    class="h-8 w-10 rounded bg-green-500/20 text-green-400 transition-colors hover:bg-green-500/30"
+                    class="h-8 w-10 rounded bg-green/10 text-green transition-colors hover:bg-green/20"
                   >
                     +10
                   </button>
                   <button
                     @click="updateScore(team.id, 20)"
-                    class="h-8 w-10 rounded bg-yellow-500/20 text-yellow-400 transition-colors hover:bg-yellow-500/30"
+                    class="h-8 w-10 rounded bg-gold/10 text-gold transition-colors hover:bg-gold/20"
                   >
                     +20
                   </button>
@@ -197,46 +197,42 @@
 
       <div class="col-span-3 space-y-4">
         <div class="glass-card p-4">
-          <h2 class="mb-4 text-lg font-semibold text-cyan-400">实时计分</h2>
+          <h2 class="mb-4 text-lg font-semibold text-green">实时计分</h2>
           <div class="max-h-[300px] space-y-3 overflow-y-auto">
             <div v-for="team in teams" :key="team.id" class="glass-card p-3">
               <div class="flex items-center justify-between">
-                <span class="font-medium text-zinc-200">{{ team.name }}</span>
-                <span class="text-2xl font-bold text-gold-gradient">{{ team.score }}</span>
+                <span class="font-medium text-ink-strong">{{ team.name }}</span>
+                <span class="data-number text-2xl font-bold text-gold">{{ team.score }}</span>
               </div>
             </div>
           </div>
         </div>
 
         <div class="glass-card p-4">
-          <h2 class="mb-4 text-lg font-semibold text-cyan-400">状态信息</h2>
+          <h2 class="mb-4 text-lg font-semibold text-green">状态信息</h2>
           <div class="space-y-2 text-sm">
             <div class="flex justify-between">
-              <span class="text-zinc-500">当前阶段</span>
-              <span class="text-zinc-200">{{ currentStage || '未开始' }}</span>
+              <span class="text-ink-soft">当前阶段</span>
+              <span class="text-ink-strong">{{ currentStage || '未开始' }}</span>
             </div>
             <div class="flex justify-between">
-              <span class="text-zinc-500">题目进度</span>
-              <span class="text-zinc-200">{{ displayQuestionProgress }}</span>
+              <span class="text-ink-soft">题目进度</span>
+              <span class="data-number text-ink-strong">{{ displayQuestionProgress }}</span>
             </div>
             <div class="flex justify-between">
-              <span class="text-zinc-500">答案状态</span>
-              <span :class="isAnswerRevealed ? 'text-green-400' : 'text-yellow-400'">
+              <span class="text-ink-soft">答案状态</span>
+              <span :class="isAnswerRevealed ? 'text-green' : 'text-gold'">
                 {{ isAnswerRevealed ? '已揭晓' : '未揭晓' }}
               </span>
             </div>
             <div class="flex justify-between">
-              <span class="text-zinc-500">队伍数量</span>
-              <span class="text-zinc-200">{{ teams.length }} 支</span>
+              <span class="text-ink-soft">队伍数量</span>
+              <span class="text-ink-strong">{{ teams.length }} 支</span>
             </div>
           </div>
         </div>
       </div>
     </div>
-
-    <footer class="fixed bottom-4 right-4 text-xs text-zinc-600">
-      Powered by College of Information Engineering and Big Data
-    </footer>
   </div>
 </template>
 
@@ -551,6 +547,6 @@ onUnmounted(() => {
 
 <style scoped>
 .font-emoji {
-  font-family: 'Noto Color Emoji', sans-serif;
+  font-family: "Noto Color Emoji", sans-serif;
 }
 </style>
