@@ -62,30 +62,41 @@ Node.js 是运行本系统的基础环境，必须安装。
 项目文件通常存储在 U 盘或共享文件夹中，包含以下文件：
 
 ```
-poetry-system/
-├── node_modules/          # 依赖包文件夹（如有）
-├── public/                # 静态资源
-│   └── 题库.json          # 题目数据
-├── src/                   # 源代码
-│   ├── views/             # 页面组件
-│   ├── utils/             # 工具函数
-│   └── ...
-├── index.html             # 入口页面
-├── package.json           # 项目配置
-├── vite.config.js         # 构建配置
-└── README.md              # 本文件
+poetry-system/                 # 根目录
+├── poetry-system/             # 项目目录（重要：在此目录下运行命令）
+│   ├── node_modules/          # 依赖包文件夹（如有）
+│   ├── public/                # 静态资源
+│   │   └── 题库.json          # 题目数据
+│   ├── src/                   # 源代码
+│   │   ├── views/             # 页面组件
+│   │   ├── utils/             # 工具函数
+│   │   └── ...
+│   ├── index.html             # 入口页面
+│   ├── package.json           # 项目配置
+│   └── vite.config.js         # 构建配置
+├── README.md                  # 本文件
+└── ...
 ```
 
-### 2.2 安装项目依赖
+### 2.2 进入项目目录
 
-1. 打开文件资源管理器，进入项目文件夹 `poetry-system`
+**重要：项目代码在子目录中，需要先进入子目录**
+
+1. 打开文件资源管理器，进入根文件夹 `poetry-system`
 2. 在地址栏输入 `cmd`，按回车（在当前目录打开命令提示符）
-3. 输入以下命令安装依赖：
+3. 进入项目子目录：
+   ```cmd
+   cd poetry-system
+   ```
+
+### 2.3 安装项目依赖
+
+1. 在项目子目录中，输入以下命令安装依赖：
    ```cmd
    npm install
    ```
-4. 等待安装完成（可能需要 1-3 分钟，取决于网络速度）
-5. 安装完成后，会生成或更新 `node_modules` 文件夹
+2. 等待安装完成（可能需要 1-3 分钟，取决于网络速度）
+3. 安装完成后，会生成或更新 `node_modules` 文件夹
 
 > ⚠️ **注意**：如果安装过程中出现错误，请跳到 [5.2 依赖安装问题](#52-依赖安装失败)
 
@@ -95,7 +106,7 @@ poetry-system/
 
 ### 3.1 启动开发服务器
 
-1. 在项目文件夹中打开命令提示符（方法同上）
+1. 确保已在项目子目录 `poetry-system` 中（命令提示符路径应显示 `...\poetry-system\poetry-system>`）
 2. 输入以下命令启动系统：
    ```cmd
    npm run dev
@@ -250,6 +261,17 @@ rmdir /s /q node_modules
 npm install
 ```
 
+#### 原因 4：不在正确的目录
+
+**现象**：提示 "Missing script: dev" 或找不到 package.json
+
+**解决方案**：确保已进入项目子目录
+```cmd
+cd poetry-system
+npm install
+npm run dev
+```
+
 ---
 
 ### 5.3 端口被占用
@@ -390,6 +412,9 @@ node --version
 # 检查 npm 版本
 npm --version
 
+# 进入项目子目录（重要！）
+cd poetry-system
+
 # 安装依赖
 npm install
 
@@ -406,20 +431,23 @@ npm run dev -- --port 3000
 ### B. 项目文件结构
 
 ```
-poetry-system/
-├── public/                # 静态资源
-│   └── 题库.json          # 题目数据（可编辑）
-├── src/
-│   ├── views/             # 页面组件
-│   │   ├── Screen.vue     # 大屏页面
-│   │   └── Admin.vue      # 控制台页面
-│   ├── utils/
-│   │   ├── channel.js     # 通信模块
-│   │   └── storage.js     # 存储模块
-│   └── style.css          # 全局样式
-├── index.html             # 入口页面
-├── package.json           # 项目配置
-└── README.md              # 本文件
+poetry-system/                    # 根目录（README 所在目录）
+├── poetry-system/                # 项目子目录（在此运行 npm 命令）
+│   ├── public/                   # 静态资源
+│   │   └── 题库.json             # 题目数据（可编辑）
+│   ├── src/
+│   │   ├── views/                # 页面组件
+│   │   │   ├── Screen.vue        # 大屏页面
+│   │   │   └── Admin.vue         # 控制台页面
+│   │   ├── utils/
+│   │   │   ├── channel.js        # 通信模块
+│   │   │   └── storage.js        # 存储模块
+│   │   └── style.css             # 全局样式
+│   ├── index.html                # 入口页面
+│   ├── package.json              # 项目配置
+│   └── vite.config.js            # 构建配置
+├── README.md                     # 本文件
+└── ...
 ```
 
 ### C. 比赛环节说明
