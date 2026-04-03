@@ -1,16 +1,15 @@
 <template>
   <div class="min-h-screen bg-zinc-900 grid-bg p-6">
-    <!-- 顶部标题栏 -->
     <header class="mb-6">
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-3xl font-bold text-gold-gradient">传承经典 · 导播控制台</h1>
-          <p class="text-zinc-400 mt-1">诗词大赛双屏互动系统 - 管理端</p>
+          <p class="mt-1 text-zinc-400">诗词大赛双屏互动系统 - 管理端</p>
         </div>
         <div class="flex items-center gap-4">
-          <div class="glass-card px-4 py-2 flex items-center gap-2">
-            <div class="w-2 h-2 rounded-full" :class="isConnected ? 'bg-green-500' : 'bg-red-500'"></div>
-            <span class="text-sm text-zinc-300">{{ isConnected ? '通讯正常' : '未连接' }}</span>
+          <div class="glass-card flex items-center gap-2 px-4 py-2">
+            <div class="h-2 w-2 rounded-full" :class="isConnected ? 'bg-green-500' : 'bg-yellow-500'"></div>
+            <span class="text-sm text-zinc-300">{{ isConnected ? 'BroadcastChannel 正常' : '已切换本地兜底同步' }}</span>
           </div>
           <button @click="openScreenWindow" class="btn-primary text-sm">
             打开大屏端
@@ -20,32 +19,28 @@
     </header>
 
     <div class="grid grid-cols-12 gap-6">
-      <!-- 左侧：题目列表 -->
       <div class="col-span-4 space-y-4">
         <div class="glass-card p-4">
-          <h2 class="text-lg font-semibold text-cyan-400 mb-4 flex items-center gap-2">
-            <span>📋</span> 题目列表
-          </h2>
-          <div class="space-y-2 max-h-[400px] overflow-y-auto">
+          <h2 class="mb-4 text-lg font-semibold text-cyan-400">题目列表</h2>
+          <div class="max-h-[400px] space-y-2 overflow-y-auto">
             <div
-              v-for="(q, index) in questions"
-              :key="q.id"
-              @click="selectQuestion(q)"
-              class="p-3 rounded-lg cursor-pointer transition-all"
-              :class="currentQuestion?.id === q.id ? 'bg-cyan-500/20 border border-cyan-500/50' : 'bg-zinc-800/50 hover:bg-zinc-800'"
+              v-for="(question, index) in questions"
+              :key="question.id"
+              class="cursor-pointer rounded-lg p-3 transition-all"
+              :class="currentQuestion?.id === question.id ? 'border border-cyan-500/50 bg-cyan-500/20' : 'bg-zinc-800/50 hover:bg-zinc-800'"
+              @click="selectQuestion(question)"
             >
               <div class="flex items-center justify-between">
-                <span class="text-sm font-medium text-zinc-200">{{ index + 1 }}. {{ q.stage }}</span>
-                <span class="text-xs text-zinc-500">{{ q.time_limit }}s</span>
+                <span class="text-sm font-medium text-zinc-200">{{ index + 1 }}. {{ question.stage }}</span>
+                <span class="text-xs text-zinc-500">{{ question.time_limit }}s</span>
               </div>
-              <p class="text-xs text-zinc-400 mt-1 truncate">{{ q.question }}</p>
+              <p class="mt-1 truncate text-xs text-zinc-400">{{ question.question }}</p>
             </div>
           </div>
         </div>
 
-        <!-- 当前题目信息 -->
-        <div class="glass-card p-4" v-if="currentQuestion">
-          <h2 class="text-lg font-semibold text-cyan-400 mb-4">当前题目</h2>
+        <div v-if="currentQuestion" class="glass-card p-4">
+          <h2 class="mb-4 text-lg font-semibold text-cyan-400">当前题目</h2>
           <div class="space-y-3">
             <div>
               <label class="text-xs text-zinc-500">题型</label>
@@ -57,13 +52,13 @@
             </div>
             <div>
               <label class="text-xs text-zinc-500">题目内容</label>
-              <p class="text-sm text-zinc-200 font-emoji">{{ currentQuestion.question }}</p>
+              <p class="font-emoji text-sm text-zinc-200">{{ currentQuestion.question }}</p>
             </div>
             <div>
               <label class="text-xs text-zinc-500">标准答案</label>
               <p class="text-sm text-gold-gradient">{{ currentQuestion.answer }}</p>
             </div>
-            <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3">
+            <div class="rounded-lg border border-yellow-500/30 bg-yellow-500/10 p-3">
               <label class="text-xs text-yellow-500">主持人提示</label>
               <p class="text-sm text-yellow-200">{{ currentQuestion.key_point }}</p>
             </div>
@@ -71,136 +66,125 @@
         </div>
       </div>
 
-      <!-- 中间：控制面板 -->
       <div class="col-span-5 space-y-4">
         <div class="glass-card p-6">
-          <h2 class="text-lg font-semibold text-cyan-400 mb-6 flex items-center gap-2">
-            <span>🎮</span> 控制面板
-          </h2>
-          
-          <!-- 题目控制 -->
+          <h2 class="mb-6 text-lg font-semibold text-cyan-400">控制面板</h2>
+
           <div class="mb-6">
-            <h3 class="text-sm font-medium text-zinc-400 mb-3">题目控制</h3>
+            <h3 class="mb-3 text-sm font-medium text-zinc-400">题目控制</h3>
             <div class="flex gap-3">
               <button
                 @click="syncToScreen"
                 :disabled="!currentQuestion"
-                class="flex-1 btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                class="btn-primary flex-1 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 同步到大屏
               </button>
               <button
                 @click="nextQuestion"
                 :disabled="!canNextQuestion"
-                class="flex-1 btn-gold disabled:opacity-50 disabled:cursor-not-allowed"
+                class="btn-gold flex-1 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 下一题
               </button>
             </div>
           </div>
 
-          <!-- 倒计时控制 -->
           <div class="mb-6">
-            <h3 class="text-sm font-medium text-zinc-400 mb-3">倒计时控制</h3>
-            <div class="flex gap-3 mb-3">
+            <h3 class="mb-3 text-sm font-medium text-zinc-400">倒计时控制</h3>
+            <div class="mb-3 flex gap-3">
               <button
                 @click="startTimer"
                 :disabled="timer.isRunning || !currentQuestion"
-                class="flex-1 btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                class="btn-primary flex-1 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 开始倒计时
               </button>
               <button
                 @click="stopTimer"
                 :disabled="!timer.isRunning"
-                class="flex-1 btn-danger disabled:opacity-50 disabled:cursor-not-allowed"
+                class="btn-danger flex-1 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 停止
               </button>
             </div>
             <div class="glass-card p-4 text-center">
-              <span class="text-4xl font-mono font-bold" :class="timer.isRunning ? 'text-cyan-400' : 'text-zinc-500'">
+              <span class="font-mono text-4xl font-bold" :class="timer.isRunning ? 'text-cyan-400' : 'text-zinc-500'">
                 {{ formatTime(timer.remaining) }}
               </span>
             </div>
           </div>
 
-          <!-- 答案控制 -->
           <div class="mb-6">
-            <h3 class="text-sm font-medium text-zinc-400 mb-3">答案控制</h3>
+            <h3 class="mb-3 text-sm font-medium text-zinc-400">答案控制</h3>
             <button
               @click="revealAnswer"
               :disabled="!currentQuestion || isAnswerRevealed"
-              class="w-full btn-gold disabled:opacity-50 disabled:cursor-not-allowed"
+              class="btn-gold w-full disabled:cursor-not-allowed disabled:opacity-50"
             >
               揭晓答案
             </button>
           </div>
 
-          <!-- 系统控制 -->
           <div>
-            <h3 class="text-sm font-medium text-zinc-400 mb-3">系统控制</h3>
+            <h3 class="mb-3 text-sm font-medium text-zinc-400">系统控制</h3>
             <div class="flex gap-3">
-              <button @click="resetScores" class="flex-1 px-4 py-2 bg-zinc-700 hover:bg-zinc-600 rounded-lg text-sm transition-colors">
+              <button @click="resetScores" class="flex-1 rounded-lg bg-zinc-700 px-4 py-2 text-sm transition-colors hover:bg-zinc-600">
                 重置分数
               </button>
-              <button @click="clearStorage" class="flex-1 px-4 py-2 bg-zinc-700 hover:bg-zinc-600 rounded-lg text-sm transition-colors">
+              <button @click="resetGame" class="flex-1 rounded-lg bg-red-900/70 px-4 py-2 text-sm transition-colors hover:bg-red-800">
+                重置比赛
+              </button>
+              <button @click="clearStorage" class="flex-1 rounded-lg bg-zinc-700 px-4 py-2 text-sm transition-colors hover:bg-zinc-600">
                 清除缓存
               </button>
             </div>
           </div>
         </div>
 
-        <!-- 队伍管理 -->
         <div class="glass-card p-6">
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-semibold text-cyan-400 flex items-center gap-2">
-              <span>👥</span> 队伍管理
-            </h2>
+          <div class="mb-4 flex items-center justify-between">
+            <h2 class="text-lg font-semibold text-cyan-400">队伍管理</h2>
             <div class="flex gap-2">
               <button
                 @click="addTeam"
-                :disabled="teams.length >= 10"
-                class="px-3 py-1 bg-green-600 hover:bg-green-500 disabled:opacity-50 disabled:cursor-not-allowed rounded text-sm transition-colors"
+                :disabled="teams.length >= 12"
+                class="rounded bg-green-600 px-3 py-1 text-sm transition-colors hover:bg-green-500 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 + 添加
               </button>
               <button
                 @click="removeTeam"
                 :disabled="teams.length <= 2"
-                class="px-3 py-1 bg-red-600 hover:bg-red-500 disabled:opacity-50 disabled:cursor-not-allowed rounded text-sm transition-colors"
+                class="rounded bg-red-600 px-3 py-1 text-sm transition-colors hover:bg-red-500 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 - 减少
               </button>
             </div>
           </div>
-          
-          <div class="space-y-3 max-h-[400px] overflow-y-auto">
-            <div
-              v-for="(team, index) in teams"
-              :key="team.id"
-              class="glass-card p-3"
-            >
+
+          <div class="max-h-[400px] space-y-3 overflow-y-auto">
+            <div v-for="(team, index) in teams" :key="team.id" class="glass-card p-3">
               <div class="flex items-center gap-3">
-                <span class="text-zinc-500 w-8">{{ index + 1 }}.</span>
-                <span class="flex-1 text-zinc-200 text-sm">{{ team.name }}</span>
+                <span class="w-8 text-zinc-500">{{ index + 1 }}.</span>
+                <span class="flex-1 text-sm text-zinc-200">{{ team.name }}</span>
                 <div class="flex gap-2">
                   <button
                     @click="updateScore(team.id, -10)"
-                    class="w-8 h-8 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded transition-colors"
+                    class="h-8 w-10 rounded bg-red-500/20 text-red-400 transition-colors hover:bg-red-500/30"
                   >
                     -10
                   </button>
                   <span class="w-12 text-center text-xl font-bold text-gold-gradient">{{ team.score }}</span>
                   <button
                     @click="updateScore(team.id, 10)"
-                    class="w-8 h-8 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded transition-colors"
+                    class="h-8 w-10 rounded bg-green-500/20 text-green-400 transition-colors hover:bg-green-500/30"
                   >
                     +10
                   </button>
                   <button
                     @click="updateScore(team.id, 20)"
-                    class="w-8 h-8 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-400 rounded transition-colors"
+                    class="h-8 w-10 rounded bg-yellow-500/20 text-yellow-400 transition-colors hover:bg-yellow-500/30"
                   >
                     +20
                   </button>
@@ -211,19 +195,11 @@
         </div>
       </div>
 
-      <!-- 右侧：状态信息 -->
       <div class="col-span-3 space-y-4">
-        <!-- 分数面板 -->
         <div class="glass-card p-4">
-          <h2 class="text-lg font-semibold text-cyan-400 mb-4 flex items-center gap-2">
-            <span>🏆</span> 实时计分
-          </h2>
-          <div class="space-y-3 max-h-[300px] overflow-y-auto">
-            <div
-              v-for="team in teams"
-              :key="team.id"
-              class="glass-card p-3"
-            >
+          <h2 class="mb-4 text-lg font-semibold text-cyan-400">实时计分</h2>
+          <div class="max-h-[300px] space-y-3 overflow-y-auto">
+            <div v-for="team in teams" :key="team.id" class="glass-card p-3">
               <div class="flex items-center justify-between">
                 <span class="font-medium text-zinc-200">{{ team.name }}</span>
                 <span class="text-2xl font-bold text-gold-gradient">{{ team.score }}</span>
@@ -232,9 +208,8 @@
           </div>
         </div>
 
-        <!-- 状态信息 -->
         <div class="glass-card p-4">
-          <h2 class="text-lg font-semibold text-cyan-400 mb-4">状态信息</h2>
+          <h2 class="mb-4 text-lg font-semibold text-cyan-400">状态信息</h2>
           <div class="space-y-2 text-sm">
             <div class="flex justify-between">
               <span class="text-zinc-500">当前阶段</span>
@@ -242,7 +217,7 @@
             </div>
             <div class="flex justify-between">
               <span class="text-zinc-500">题目进度</span>
-              <span class="text-zinc-200">{{ currentQuestionIndex + 1 }} / {{ questions.length }}</span>
+              <span class="text-zinc-200">{{ displayQuestionProgress }}</span>
             </div>
             <div class="flex justify-between">
               <span class="text-zinc-500">答案状态</span>
@@ -256,33 +231,9 @@
             </div>
           </div>
         </div>
-
-        <!-- 快捷键说明 -->
-        <div class="glass-card p-4">
-          <h2 class="text-lg font-semibold text-cyan-400 mb-4">快捷键</h2>
-          <div class="space-y-2 text-sm text-zinc-400">
-            <div class="flex justify-between">
-              <span>空格</span>
-              <span class="text-zinc-500">开始/停止倒计时</span>
-            </div>
-            <div class="flex justify-between">
-              <span>Enter</span>
-              <span class="text-zinc-500">揭晓答案</span>
-            </div>
-            <div class="flex justify-between">
-              <span>→</span>
-              <span class="text-zinc-500">下一题</span>
-            </div>
-            <div class="flex justify-between">
-              <span>S</span>
-              <span class="text-zinc-500">同步到大屏</span>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
 
-    <!-- 底部水印 -->
     <footer class="fixed bottom-4 right-4 text-xs text-zinc-600">
       Powered by College of Information Engineering and Big Data
     </footer>
@@ -290,11 +241,10 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { poetryChannel, COMMANDS } from '../utils/channel.js'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { COMMANDS, poetryChannel } from '../utils/channel.js'
 import { storage } from '../utils/storage.js'
 
-// 状态
 const isConnected = ref(false)
 const questions = ref([])
 const currentQuestion = ref(null)
@@ -304,226 +254,246 @@ const isAnswerRevealed = ref(false)
 const timer = ref({
   isRunning: false,
   remaining: 0,
-  total: 0
+  total: 0,
+  endAt: null
 })
 const teams = ref([])
 
 let timerInterval = null
 let unsubscribeList = []
 
-// 计算属性
+const getDefaultTimer = (seconds = 0) => ({
+  isRunning: false,
+  remaining: seconds,
+  total: seconds,
+  endAt: null
+})
+
 const canNextQuestion = computed(() => {
   return isAnswerRevealed.value && currentQuestionIndex.value < questions.value.length - 1
 })
 
-// 格式化时间
+const displayQuestionProgress = computed(() => {
+  if (currentQuestionIndex.value < 0) {
+    return `0 / ${questions.value.length}`
+  }
+
+  return `${currentQuestionIndex.value + 1} / ${questions.value.length}`
+})
+
 const formatTime = (seconds) => {
-  const mins = Math.floor(seconds / 60)
-  const secs = seconds % 60
+  const safeSeconds = Math.max(0, Number(seconds) || 0)
+  const mins = Math.floor(safeSeconds / 60)
+  const secs = safeSeconds % 60
   return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
 }
 
-// 加载题库
-const loadQuestions = async () => {
-  try {
-    const response = await fetch('/题库.json')
-    questions.value = await response.json()
-  } catch (error) {
-    console.error('加载题库失败:', error)
-    // 使用默认测试数据
-    questions.value = [
-      {
-        id: '1',
-        stage: 'Emoji猜诗',
-        rule: '根据Emoji表情猜出对应的诗句，限时8秒',
-        question: '☀️🌙🚶🚶',
-        answer: '两个黄鹂鸣翠柳',
-        key_point: '注意"鹂"字的读音',
-        time_limit: 8
-      },
-      {
-        id: '2',
-        stage: '宫格寻诗',
-        rule: '从宫格中找出正确的诗句',
-        question: '春|风|又|绿|江|南|岸|明|月',
-        answer: '春风又绿江南岸',
-        key_point: '王安石《泊船瓜洲》名句',
-        time_limit: 10
-      }
-    ]
-  }
-}
-
-// 选择题目
-const selectQuestion = (question) => {
-  currentQuestion.value = question
-  currentQuestionIndex.value = questions.value.findIndex(q => q.id === question.id)
-  isAnswerRevealed.value = false
-  timer.value = {
-    isRunning: false,
-    remaining: question.time_limit,
-    total: question.time_limit
-  }
-  saveState()
-}
-
-// 同步到大屏
-const syncToScreen = () => {
-  if (!currentQuestion.value) return
-  
-  poetryChannel.syncQuestion({
-    ...currentQuestion.value,
-    index: currentQuestionIndex.value
+const saveState = () => {
+  storage.save({
+    currentQuestion: currentQuestion.value,
+    currentQuestionIndex: currentQuestionIndex.value,
+    currentStage: currentStage.value,
+    teams: teams.value,
+    timer: timer.value,
+    isAnswerRevealed: isAnswerRevealed.value
   })
-  
-  currentStage.value = currentQuestion.value.stage
-  poetryChannel.changeStage(currentQuestion.value.stage)
-  
-  // 同步队伍信息
-  poetryChannel.updateTeams([...teams.value])
-  
-  saveState()
 }
 
-// 开始倒计时
-const startTimer = () => {
-  if (!currentQuestion.value || timer.value.isRunning) return
-  
-  timer.value.isRunning = true
-  poetryChannel.startTimer(timer.value.remaining)
-  saveState()
-  
-  timerInterval = setInterval(() => {
-    if (timer.value.remaining > 0) {
-      timer.value.remaining--
-      saveState()
-    } else {
-      stopTimer()
-    }
-  }, 1000)
-}
-
-// 停止倒计时
-const stopTimer = () => {
-  timer.value.isRunning = false
+const stopLocalTimer = () => {
   if (timerInterval) {
     clearInterval(timerInterval)
     timerInterval = null
   }
-  poetryChannel.stopTimer()
+}
+
+const syncTimerFromEndAt = () => {
+  if (!timer.value.endAt) return
+  timer.value.remaining = Math.max(0, Math.ceil((timer.value.endAt - Date.now()) / 1000))
+}
+
+const startLocalTimer = () => {
+  stopLocalTimer()
+
+  if (!timer.value.isRunning || !timer.value.endAt) {
+    return
+  }
+
+  syncTimerFromEndAt()
+
+  timerInterval = setInterval(() => {
+    syncTimerFromEndAt()
+    if (timer.value.remaining <= 0) {
+      stopTimer(false)
+      return
+    }
+    saveState()
+  }, 1000)
+}
+
+const applyState = (state) => {
+  currentQuestion.value = state.currentQuestion || null
+  currentQuestionIndex.value = Number.isInteger(state.currentQuestionIndex) ? state.currentQuestionIndex : -1
+  currentStage.value = state.currentStage || ''
+  teams.value = state.teams && state.teams.length > 0 ? state.teams : storage.getDefaultTeams()
+  timer.value = state.timer || getDefaultTimer()
+  isAnswerRevealed.value = Boolean(state.isAnswerRevealed)
+  startLocalTimer()
+}
+
+const loadQuestions = async () => {
+  const response = await fetch('/questions.json')
+  if (!response.ok) {
+    throw new Error(`Failed to load questions: ${response.status}`)
+  }
+
+  const data = await response.json()
+  if (!Array.isArray(data)) {
+    throw new Error('Question data must be an array')
+  }
+
+  questions.value = data.filter((item) => item && item.id && item.stage && item.question && item.answer)
+}
+
+const selectQuestion = (question) => {
+  currentQuestion.value = question
+  currentQuestionIndex.value = questions.value.findIndex((item) => item.id === question.id)
+  currentStage.value = question.stage
+  isAnswerRevealed.value = false
+  timer.value = getDefaultTimer(Number(question.time_limit) || 0)
   saveState()
 }
 
-// 揭晓答案
+const syncToScreen = () => {
+  if (!currentQuestion.value) return
+
+  poetryChannel.syncQuestion({
+    ...currentQuestion.value,
+    index: currentQuestionIndex.value
+  })
+  poetryChannel.changeStage(currentQuestion.value.stage)
+  poetryChannel.updateTeams([...teams.value])
+  saveState()
+}
+
+const startTimer = () => {
+  if (!currentQuestion.value || timer.value.isRunning || timer.value.remaining <= 0) return
+
+  timer.value.isRunning = true
+  timer.value.endAt = Date.now() + timer.value.remaining * 1000
+  poetryChannel.startTimer(timer.value.remaining, timer.value.endAt)
+  startLocalTimer()
+  saveState()
+}
+
+const stopTimer = (shouldBroadcast = true) => {
+  if (timer.value.endAt) {
+    syncTimerFromEndAt()
+  }
+
+  timer.value.isRunning = false
+  timer.value.endAt = null
+  stopLocalTimer()
+
+  if (shouldBroadcast) {
+    poetryChannel.stopTimer()
+  }
+
+  saveState()
+}
+
 const revealAnswer = () => {
+  if (!currentQuestion.value) return
   isAnswerRevealed.value = true
   poetryChannel.revealAnswer()
   saveState()
 }
 
-// 下一题
 const nextQuestion = () => {
-  if (currentQuestionIndex.value < questions.value.length - 1) {
-    stopTimer()
-    selectQuestion(questions.value[currentQuestionIndex.value + 1])
-    syncToScreen()
-  }
+  if (!canNextQuestion.value) return
+
+  stopTimer()
+  const next = questions.value[currentQuestionIndex.value + 1]
+  if (!next) return
+
+  selectQuestion(next)
+  syncToScreen()
 }
 
-// 更新分数
 const updateScore = (teamId, delta) => {
-  const team = teams.value.find(t => t.id === teamId)
-  if (team) {
-    team.score = Math.max(0, team.score + delta)
-    poetryChannel.updateScore(teamId, team.score)
-    saveState()
-  }
+  const team = teams.value.find((item) => item.id === teamId)
+  if (!team) return
+
+  team.score = Math.max(0, team.score + delta)
+  poetryChannel.updateScore(teamId, team.score)
+  saveState()
 }
 
-// 添加队伍
 const addTeam = () => {
-  if (teams.value.length >= 10) return
-  
-  const newId = `team${teams.value.length + 1}`
+  if (teams.value.length >= 12) return
+
+  const nextIndex = teams.value.length + 1
   teams.value.push({
-    id: newId,
-    name: `战队${teams.value.length + 1}`,
+    id: `team${nextIndex}`,
+    name: `队伍${nextIndex}`,
     score: 0
   })
-  
-  console.log('[Admin] 发送 UPDATE_TEAMS:', teams.value)
+
   poetryChannel.updateTeams([...teams.value])
   saveState()
 }
 
-// 减少队伍
 const removeTeam = () => {
   if (teams.value.length <= 2) return
-  
   teams.value.pop()
-  
   poetryChannel.updateTeams([...teams.value])
   saveState()
 }
 
-// 重置分数
 const resetScores = () => {
-  teams.value.forEach(team => {
-    team.score = 0
-  })
+  teams.value = teams.value.map((team) => ({
+    ...team,
+    score: 0
+  }))
+  poetryChannel.resetScores()
+  saveState()
+}
+
+const resetGame = () => {
+  stopTimer(false)
+  currentQuestion.value = null
+  currentQuestionIndex.value = -1
+  currentStage.value = ''
+  isAnswerRevealed.value = false
+  timer.value = getDefaultTimer()
+  teams.value = teams.value.map((team) => ({
+    ...team,
+    score: 0
+  }))
   poetryChannel.resetGame()
   saveState()
 }
 
-// 清除缓存
 const clearStorage = () => {
   storage.clear()
   location.reload()
 }
 
-// 保存状态
-const saveState = () => {
-  storage.save({
-    currentQuestion: currentQuestion.value,
-    currentStage: currentStage.value,
-    teams: teams.value,
-    timer: timer.value,
-    isAnswerRevealed: isAnswerRevealed.value,
-    currentQuestionIndex: currentQuestionIndex.value
-  })
-}
-
-// 恢复状态
 const restoreState = () => {
-  const state = storage.load()
-  if (state.teams && state.teams.length > 0) {
-    teams.value = state.teams
-  } else {
-    teams.value = storage.getDefaultTeams()
-  }
-  
-  if (state.currentQuestion) {
-    currentQuestion.value = state.currentQuestion
-    currentStage.value = state.currentStage
-    timer.value = state.timer
-    isAnswerRevealed.value = state.isAnswerRevealed
-    currentQuestionIndex.value = state.currentQuestionIndex
-  }
+  applyState(storage.load())
 }
 
-// 打开大屏端窗口
 const openScreenWindow = () => {
   window.open('/screen', 'screen', 'width=1920,height=1080,fullscreen=yes')
 }
 
-// 键盘快捷键
-const handleKeydown = (e) => {
-  // 如果正在输入框中，不处理快捷键
-  if (e.target.tagName === 'INPUT') return
-  
-  switch (e.key) {
+const handleKeydown = (event) => {
+  if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
+    return
+  }
+
+  switch (event.key) {
     case ' ':
-      e.preventDefault()
+      event.preventDefault()
       if (timer.value.isRunning) {
         stopTimer()
       } else {
@@ -542,54 +512,45 @@ const handleKeydown = (e) => {
       break
     case 's':
     case 'S':
-      e.preventDefault()
-      console.log('[Admin] S键按下, currentQuestion:', currentQuestion.value)
-      if (currentQuestion.value) {
-        syncToScreen()
-      }
+      event.preventDefault()
+      syncToScreen()
+      break
+    default:
       break
   }
 }
 
-// 生命周期
 onMounted(async () => {
-  // 初始化通讯频道
   isConnected.value = poetryChannel.init()
-  
-  // 加载题库
-  await loadQuestions()
-  
-  // 恢复状态
+
+  try {
+    await loadQuestions()
+  } catch (error) {
+    console.error(error)
+    questions.value = []
+  }
+
   restoreState()
-  
-  // 监听大屏端消息
-  unsubscribeList.push(
+
+  unsubscribeList = [
     poetryChannel.on(COMMANDS.HEARTBEAT, () => {
-      console.log('收到大屏端心跳')
+      isConnected.value = true
     })
-  )
-  
-  // 注册键盘事件
+  ]
+
   window.addEventListener('keydown', handleKeydown)
 })
 
 onUnmounted(() => {
-  // 清理定时器
-  if (timerInterval) {
-    clearInterval(timerInterval)
-  }
-  
-  // 取消订阅
-  unsubscribeList.forEach(unsubscribe => unsubscribe())
-  
-  // 关闭频道
+  stopLocalTimer()
+  unsubscribeList.forEach((unsubscribe) => unsubscribe())
   poetryChannel.close()
-  
-  // 移除键盘事件
   window.removeEventListener('keydown', handleKeydown)
 })
 </script>
 
 <style scoped>
-/* 组件特定样式 */
+.font-emoji {
+  font-family: 'Noto Color Emoji', sans-serif;
+}
 </style>
