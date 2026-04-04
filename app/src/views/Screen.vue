@@ -25,7 +25,7 @@
       </div>
     </header>
 
-    <main class="flex min-h-screen flex-col justify-center px-12 pb-32 pt-40">
+    <main class="flex min-h-screen flex-col justify-center px-12 pb-24 pt-28">
       <div class="flex flex-1 items-center justify-center">
         <div v-if="!currentQuestion" class="text-center">
           <div class="mb-8 text-8xl text-gold">待命</div>
@@ -34,13 +34,13 @@
         </div>
 
         <div v-else class="w-full max-w-6xl">
-          <div class="mb-12 text-center">
-            <span class="glass-card inline-block px-8 py-3 text-xl text-green">
+          <div class="mb-6 text-center">
+            <span class="glass-card inline-block px-6 py-2 text-lg text-green">
               {{ currentQuestion.rule }}
             </span>
           </div>
 
-          <div class="glass-card mb-12 p-16">
+          <div class="glass-card mb-6 p-10">
             <div v-if="currentQuestion.stage === 'Emoji 猜诗'" class="text-center">
               <div class="font-emoji text-[120px] leading-tight tracking-wider">
                 {{ currentQuestion.question }}
@@ -92,7 +92,7 @@
             </div>
           </div>
 
-          <div v-if="isAnswerRevealed" class="glass-card border-gold/30 bg-gold/10 p-8">
+          <div v-if="isAnswerRevealed" class="glass-card border-gold/30 bg-gold/10 p-6">
             <div class="text-center">
               <div class="mb-2 text-sm text-gold">正确答案</div>
               <div class="text-5xl text-gold-gradient">
