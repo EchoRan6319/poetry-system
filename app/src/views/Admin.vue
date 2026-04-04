@@ -641,9 +641,12 @@ const restoreState = () => {
 }
 
 const openScreenWindow = () => {
-  const baseUrl = window.location.href.split('#')[0]
+  let baseUrl = window.location.href.split('#')[0]
+  if (!baseUrl.endsWith('/')) {
+    baseUrl += '/'
+  }
   const screenUrl = `${baseUrl}#/screen`
-  window.open(screenUrl, 'screen', 'width=1920,height=1080,fullscreen=yes')
+  window.open(screenUrl, '_blank', 'width=1920,height=1080')
 }
 
 const handleKeydown = (event) => {
