@@ -641,8 +641,9 @@ const restoreState = () => {
 }
 
 const openScreenWindow = () => {
-  const screenUrl = new URL(`${import.meta.env.BASE_URL}#/screen`, window.location.origin)
-  window.open(screenUrl.toString(), 'screen', 'width=1920,height=1080,fullscreen=yes')
+  const baseUrl = window.location.href.split('#')[0]
+  const screenUrl = `${baseUrl}#/screen`
+  window.open(screenUrl, 'screen', 'width=1920,height=1080,fullscreen=yes')
 }
 
 const handleKeydown = (event) => {
