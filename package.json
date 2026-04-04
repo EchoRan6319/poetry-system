@@ -2,11 +2,11 @@
   "name": "poetry-system-root",
   "private": true,
   "workspaces": [
-    "src"
+    "app"
   ],
   "scripts": {
-    "dev": "npm run dev --workspace src",
-    "build": "npm run build --workspace src",
-    "preview": "npm run preview --workspace src"
+    "dev": "npm run dev --workspace app",
+    "build": "npm run build --workspace app",
+    "preview": "npm run preview --workspace app"
   }
 }

@@ -279,6 +279,12 @@
     box-shadow: 0 16px 28px rgba(73, 58, 32, 0.1);
   }
 
+  .question-tile-synced {
+    border-color: rgba(93, 122, 104, 0.42);
+    background: linear-gradient(180deg, rgba(244, 251, 245, 0.96), rgba(224, 238, 227, 0.92));
+    box-shadow: 0 16px 30px rgba(63, 101, 83, 0.14);
+  }
+
   .poem-surface {
     @apply ceremony-frame relative overflow-hidden px-8 py-10 md:px-12 md:py-14;
     background:
@@ -359,6 +365,16 @@
 
   .btn-primary:hover {
     filter: brightness(1.02);
+  }
+
+  .btn-primary-active {
+    @apply rounded-lg px-6 py-3 font-semibold text-paper-soft transition-all duration-200;
+    background: linear-gradient(135deg, #456856, #5d8a73);
+    box-shadow: 0 12px 26px rgba(69, 104, 86, 0.28);
+  }
+
+  .btn-primary-active:hover {
+    filter: brightness(1.03);
   }
 
   .btn-gold {

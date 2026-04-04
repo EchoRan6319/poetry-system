@@ -1,4 +1,5 @@
-const STORAGE_KEY = 'poetry-competition-state'
+const ADMIN_STORAGE_KEY = 'poetry-competition-admin-state'
+const SCREEN_STORAGE_KEY = 'poetry-competition-screen-state'
 
 const defaultTeams = [
   { id: 'team1', name: '财经与金融管理学院', score: 0 },
@@ -17,6 +18,7 @@ const defaultTeams = [
 const defaultState = {
   currentQuestion: null,
   currentQuestionIndex: -1,
+  syncedQuestionId: null,
   currentStage: '',
   teams: defaultTeams,
   timer: {
@@ -65,47 +67,81 @@ const normalizeState = (state = {}) => ({
   ...clone(defaultState),
   ...state,
   currentQuestionIndex: Number.isInteger(state.currentQuestionIndex) ? state.currentQuestionIndex : -1,
+  syncedQuestionId: typeof state.syncedQuestionId === 'string' ? state.syncedQuestionId : null,
   teams: normalizeTeams(state.teams),
   timer: normalizeTimer(state.timer)
 })
 
-export const storage = {
-  save(state) {
-    try {
-      const data = {
-        ...normalizeState(state),
-        lastUpdate: Date.now()
-      }
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
-      return true
-    } catch (error) {
-      console.error('[Storage] save failed:', error)
-      return false
+const saveByKey = (key, state) => {
+  try {
+    const data = {
+      ...normalizeState(state),
+      lastUpdate: Date.now()
     }
-  },
+    localStorage.setItem(key, JSON.stringify(data))
+    return true
+  } catch (error) {
+    console.error(`[Storage] save failed for ${key}:`, error)
+    return false
+  }
+}
 
-  load() {
-    try {
-      const data = localStorage.getItem(STORAGE_KEY)
-      if (!data) {
-        return clone(defaultState)
-      }
-
-      return normalizeState(JSON.parse(data))
-    } catch (error) {
-      console.error('[Storage] load failed:', error)
+const loadByKey = (key) => {
+  try {
+    const data = localStorage.getItem(key)
+    if (!data) {
       return clone(defaultState)
     }
+
+    return normalizeState(JSON.parse(data))
+  } catch (error) {
+    console.error(`[Storage] load failed for ${key}:`, error)
+    return clone(defaultState)
+  }
+}
+
+const clearByKey = (key) => {
+  try {
+    localStorage.removeItem(key)
+    return true
+  } catch (error) {
+    console.error(`[Storage] clear failed for ${key}:`, error)
+    return false
+  }
+}
+
+export const storage = {
+  ADMIN_STORAGE_KEY,
+  SCREEN_STORAGE_KEY,
+
+  saveAdmin(state) {
+    return saveByKey(ADMIN_STORAGE_KEY, state)
+  },
+
+  loadAdmin() {
+    return loadByKey(ADMIN_STORAGE_KEY)
+  },
+
+  clearAdmin() {
+    return clearByKey(ADMIN_STORAGE_KEY)
+  },
+
+  saveScreen(state) {
+    return saveByKey(SCREEN_STORAGE_KEY, state)
+  },
+
+  loadScreen() {
+    return loadByKey(SCREEN_STORAGE_KEY)
+  },
+
+  clearScreen() {
+    return clearByKey(SCREEN_STORAGE_KEY)
   },
 
   clear() {
-    try {
-      localStorage.removeItem(STORAGE_KEY)
-      return true
-    } catch (error) {
-      console.error('[Storage] clear failed:', error)
-      return false
-    }
+    const adminCleared = clearByKey(ADMIN_STORAGE_KEY)
+    const screenCleared = clearByKey(SCREEN_STORAGE_KEY)
+    return adminCleared && screenCleared
   },
 
   getDefaultState() {

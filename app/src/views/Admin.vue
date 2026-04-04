@@ -9,7 +9,7 @@
         <div class="flex items-center gap-4">
           <div class="glass-card flex items-center gap-2 px-4 py-2">
             <div class="h-2 w-2 rounded-full" :class="isConnected ? 'bg-green' : 'bg-gold'"></div>
-            <span class="text-sm text-ink">{{ isConnected ? 'BroadcastChannel 正常' : '已切换本地兜底同步' }}</span>
+            <span class="text-sm text-ink">{{ isConnected ? 'BroadcastChannel 正常' : '已切换本地缓存同步' }}</span>
           </div>
           <button @click="openScreenWindow" class="btn-primary text-sm">
             打开大屏端
@@ -26,13 +26,27 @@
             <div
               v-for="(question, index) in questions"
               :key="question.id"
-              class="cursor-pointer rounded-lg p-3 transition-all"
-              :class="currentQuestion?.id === question.id ? 'border border-gold/40 bg-gold/10' : 'bg-paper-soft/60 hover:bg-paper-soft/90'"
+              class="question-tile"
+              :class="questionCardClass(question)"
               @click="selectQuestion(question)"
             >
-              <div class="flex items-center justify-between">
+              <div class="flex items-center justify-between gap-3">
                 <span class="text-sm font-medium text-ink-strong">{{ index + 1 }}. {{ question.stage }}</span>
-                <span class="text-xs text-ink-soft">{{ question.time_limit }}s</span>
+                <div class="flex items-center gap-2">
+                  <span
+                    v-if="syncedQuestionId === question.id"
+                    class="rounded-full border border-green/30 bg-green/10 px-2 py-0.5 text-[10px] font-semibold tracking-[0.18em] text-green"
+                  >
+                    已同步
+                  </span>
+                  <span
+                    v-else-if="currentQuestion?.id === question.id"
+                    class="rounded-full border border-gold/30 bg-gold/10 px-2 py-0.5 text-[10px] font-semibold tracking-[0.18em] text-gold"
+                  >
+                    待同步
+                  </span>
+                  <span class="text-xs text-ink-soft">{{ question.time_limit }}s</span>
+                </div>
               </div>
               <p class="mt-1 truncate text-xs text-ink-soft">{{ question.question }}</p>
             </div>
@@ -76,9 +90,10 @@
               <button
                 @click="syncToScreen"
                 :disabled="!currentQuestion"
-                class="btn-primary flex-1 disabled:cursor-not-allowed disabled:opacity-50"
+                :class="syncButtonClass"
+                class="flex-1 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                同步到大屏
+                {{ syncButtonLabel }}
               </button>
               <button
                 @click="nextQuestion"
@@ -220,6 +235,12 @@
               <span class="data-number text-ink-strong">{{ displayQuestionProgress }}</span>
             </div>
             <div class="flex justify-between">
+              <span class="text-ink-soft">同步状态</span>
+              <span :class="isCurrentQuestionSynced ? 'text-green' : 'text-gold'">
+                {{ isCurrentQuestionSynced ? '已同步' : '待同步' }}
+              </span>
+            </div>
+            <div class="flex justify-between">
               <span class="text-ink-soft">答案状态</span>
               <span :class="isAnswerRevealed ? 'text-green' : 'text-gold'">
                 {{ isAnswerRevealed ? '已揭晓' : '未揭晓' }}
@@ -228,6 +249,28 @@
             <div class="flex justify-between">
               <span class="text-ink-soft">队伍数量</span>
               <span class="text-ink-strong">{{ teams.length }} 支</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card p-4">
+          <h2 class="mb-4 text-lg font-semibold text-green">快捷键</h2>
+          <div class="space-y-3 text-sm">
+            <div class="flex items-center justify-between gap-3">
+              <span class="text-ink-soft">开始或停止倒计时</span>
+              <kbd class="rounded-md border border-gold/30 bg-gold/10 px-2 py-1 text-xs font-semibold text-gold">Space</kbd>
+            </div>
+            <div class="flex items-center justify-between gap-3">
+              <span class="text-ink-soft">揭晓答案</span>
+              <kbd class="rounded-md border border-gold/30 bg-gold/10 px-2 py-1 text-xs font-semibold text-gold">Enter</kbd>
+            </div>
+            <div class="flex items-center justify-between gap-3">
+              <span class="text-ink-soft">下一题</span>
+              <kbd class="rounded-md border border-gold/30 bg-gold/10 px-2 py-1 text-xs font-semibold text-gold">ArrowRight</kbd>
+            </div>
+            <div class="flex items-center justify-between gap-3">
+              <span class="text-ink-soft">同步到大屏</span>
+              <kbd class="rounded-md border border-green/30 bg-green/10 px-2 py-1 text-xs font-semibold text-green">S</kbd>
             </div>
           </div>
         </div>
@@ -245,8 +288,10 @@ const isConnected = ref(false)
 const questions = ref([])
 const currentQuestion = ref(null)
 const currentQuestionIndex = ref(-1)
+const syncedQuestionId = ref(null)
 const currentStage = ref('')
 const isAnswerRevealed = ref(false)
+const screenState = ref(storage.getDefaultState())
 const timer = ref({
   isRunning: false,
   remaining: 0,
@@ -269,6 +314,22 @@ const canNextQuestion = computed(() => {
   return isAnswerRevealed.value && currentQuestionIndex.value < questions.value.length - 1
 })
 
+const isCurrentQuestionSynced = computed(() => {
+  return Boolean(currentQuestion.value?.id) && currentQuestion.value.id === syncedQuestionId.value
+})
+
+const syncButtonClass = computed(() => {
+  return isCurrentQuestionSynced.value ? 'btn-primary-active' : 'btn-primary'
+})
+
+const syncButtonLabel = computed(() => {
+  if (!currentQuestion.value) {
+    return '同步到大屏'
+  }
+
+  return isCurrentQuestionSynced.value ? '已同步到大屏' : '同步到大屏'
+})
+
 const displayQuestionProgress = computed(() => {
   if (currentQuestionIndex.value < 0) {
     return `0 / ${questions.value.length}`
@@ -284,14 +345,27 @@ const formatTime = (seconds) => {
   return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
 }
 
-const saveState = () => {
-  storage.save({
+const saveAdminState = () => {
+  storage.saveAdmin({
     currentQuestion: currentQuestion.value,
     currentQuestionIndex: currentQuestionIndex.value,
+    syncedQuestionId: syncedQuestionId.value,
     currentStage: currentStage.value,
     teams: teams.value,
     timer: timer.value,
     isAnswerRevealed: isAnswerRevealed.value
+  })
+}
+
+const saveScreenState = () => {
+  storage.saveScreen({
+    currentQuestion: screenState.value.currentQuestion,
+    currentQuestionIndex: screenState.value.currentQuestionIndex,
+    syncedQuestionId: syncedQuestionId.value,
+    currentStage: screenState.value.currentStage,
+    teams: screenState.value.teams,
+    timer: screenState.value.timer,
+    isAnswerRevealed: screenState.value.isAnswerRevealed
   })
 }
 
@@ -322,13 +396,14 @@ const startLocalTimer = () => {
       stopTimer(false)
       return
     }
-    saveState()
+    saveAdminState()
   }, 1000)
 }
 
 const applyState = (state) => {
   currentQuestion.value = state.currentQuestion || null
   currentQuestionIndex.value = Number.isInteger(state.currentQuestionIndex) ? state.currentQuestionIndex : -1
+  syncedQuestionId.value = state.syncedQuestionId || null
   currentStage.value = state.currentStage || ''
   teams.value = state.teams && state.teams.length > 0 ? state.teams : storage.getDefaultTeams()
   timer.value = state.timer || getDefaultTimer()
@@ -336,8 +411,17 @@ const applyState = (state) => {
   startLocalTimer()
 }
 
+const applyScreenState = (state) => {
+  screenState.value = {
+    ...storage.getDefaultState(),
+    ...state,
+    teams: state.teams && state.teams.length > 0 ? [...state.teams] : storage.getDefaultTeams(),
+    timer: state.timer ? { ...state.timer } : getDefaultTimer()
+  }
+}
+
 const loadQuestions = async () => {
-  const response = await fetch('/questions.json')
+  const response = await fetch(`${import.meta.env.BASE_URL}questions.json`)
   if (!response.ok) {
     throw new Error(`Failed to load questions: ${response.status}`)
   }
@@ -356,19 +440,51 @@ const selectQuestion = (question) => {
   currentStage.value = question.stage
   isAnswerRevealed.value = false
   timer.value = getDefaultTimer(Number(question.time_limit) || 0)
-  saveState()
+  saveAdminState()
+}
+
+const questionCardClass = (question) => {
+  if (syncedQuestionId.value === question.id) {
+    return 'question-tile-synced'
+  }
+
+  if (currentQuestion.value?.id === question.id) {
+    return 'question-tile-active'
+  }
+
+  return 'bg-paper-soft/60 hover:bg-paper-soft/90'
 }
 
 const syncToScreen = () => {
   if (!currentQuestion.value) return
+
+  screenState.value = {
+    ...screenState.value,
+    currentQuestion: currentQuestion.value,
+    currentQuestionIndex: currentQuestionIndex.value,
+    currentStage: currentStage.value,
+    teams: [...teams.value],
+    timer: { ...timer.value },
+    isAnswerRevealed: isAnswerRevealed.value
+  }
 
   poetryChannel.syncQuestion({
     ...currentQuestion.value,
     index: currentQuestionIndex.value
   })
   poetryChannel.changeStage(currentQuestion.value.stage)
+  screenState.value = {
+    ...screenState.value,
+    teams: [...teams.value]
+  }
+  screenState.value = {
+    ...screenState.value,
+    teams: [...teams.value]
+  }
   poetryChannel.updateTeams([...teams.value])
-  saveState()
+  syncedQuestionId.value = currentQuestion.value.id
+  saveAdminState()
+  saveScreenState()
 }
 
 const startTimer = () => {
@@ -376,9 +492,16 @@ const startTimer = () => {
 
   timer.value.isRunning = true
   timer.value.endAt = Date.now() + timer.value.remaining * 1000
+  if (isCurrentQuestionSynced.value) {
+    screenState.value = {
+      ...screenState.value,
+      timer: { ...timer.value }
+    }
+  }
   poetryChannel.startTimer(timer.value.remaining, timer.value.endAt)
   startLocalTimer()
-  saveState()
+  saveAdminState()
+  saveScreenState()
 }
 
 const stopTimer = (shouldBroadcast = true) => {
@@ -389,19 +512,33 @@ const stopTimer = (shouldBroadcast = true) => {
   timer.value.isRunning = false
   timer.value.endAt = null
   stopLocalTimer()
+  if (isCurrentQuestionSynced.value) {
+    screenState.value = {
+      ...screenState.value,
+      timer: { ...timer.value }
+    }
+  }
 
   if (shouldBroadcast) {
     poetryChannel.stopTimer()
   }
 
-  saveState()
+  saveAdminState()
+  saveScreenState()
 }
 
 const revealAnswer = () => {
   if (!currentQuestion.value) return
   isAnswerRevealed.value = true
+  if (isCurrentQuestionSynced.value) {
+    screenState.value = {
+      ...screenState.value,
+      isAnswerRevealed: true
+    }
+  }
   poetryChannel.revealAnswer()
-  saveState()
+  saveAdminState()
+  saveScreenState()
 }
 
 const nextQuestion = () => {
@@ -420,8 +557,13 @@ const updateScore = (teamId, delta) => {
   if (!team) return
 
   team.score = Math.max(0, team.score + delta)
+  screenState.value = {
+    ...screenState.value,
+    teams: [...teams.value]
+  }
   poetryChannel.updateScore(teamId, team.score)
-  saveState()
+  saveAdminState()
+  saveScreenState()
 }
 
 const addTeam = () => {
@@ -434,15 +576,25 @@ const addTeam = () => {
     score: 0
   })
 
+  screenState.value = {
+    ...screenState.value,
+    teams: [...teams.value]
+  }
   poetryChannel.updateTeams([...teams.value])
-  saveState()
+  saveAdminState()
+  saveScreenState()
 }
 
 const removeTeam = () => {
   if (teams.value.length <= 2) return
   teams.value.pop()
+  screenState.value = {
+    ...screenState.value,
+    teams: [...teams.value]
+  }
   poetryChannel.updateTeams([...teams.value])
-  saveState()
+  saveAdminState()
+  saveScreenState()
 }
 
 const resetScores = () => {
@@ -450,14 +602,20 @@ const resetScores = () => {
     ...team,
     score: 0
   }))
+  screenState.value = {
+    ...screenState.value,
+    teams: [...teams.value]
+  }
   poetryChannel.resetScores()
-  saveState()
+  saveAdminState()
+  saveScreenState()
 }
 
 const resetGame = () => {
   stopTimer(false)
   currentQuestion.value = null
   currentQuestionIndex.value = -1
+  syncedQuestionId.value = null
   currentStage.value = ''
   isAnswerRevealed.value = false
   timer.value = getDefaultTimer()
@@ -465,8 +623,11 @@ const resetGame = () => {
     ...team,
     score: 0
   }))
+  screenState.value = storage.getDefaultState()
+  screenState.value.teams = [...teams.value]
   poetryChannel.resetGame()
-  saveState()
+  saveAdminState()
+  saveScreenState()
 }
 
 const clearStorage = () => {
@@ -475,11 +636,13 @@ const clearStorage = () => {
 }
 
 const restoreState = () => {
-  applyState(storage.load())
+  applyState(storage.loadAdmin())
+  applyScreenState(storage.loadScreen())
 }
 
 const openScreenWindow = () => {
-  window.open('/screen', 'screen', 'width=1920,height=1080,fullscreen=yes')
+  const screenUrl = new URL(`${import.meta.env.BASE_URL}#/screen`, window.location.origin)
+  window.open(screenUrl.toString(), 'screen', 'width=1920,height=1080,fullscreen=yes')
 }
 
 const handleKeydown = (event) => {

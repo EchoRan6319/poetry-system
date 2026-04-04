@@ -197,7 +197,7 @@ const handleTeamScroll = (event) => {
 }
 
 const saveState = () => {
-  storage.save({
+  storage.saveScreen({
     currentQuestion: currentQuestion.value,
     currentStage: currentStage.value,
     teams: teams.value,
@@ -266,15 +266,15 @@ const applyState = (state) => {
 }
 
 const restoreState = () => {
-  applyState(storage.load())
+  applyState(storage.loadScreen())
 }
 
 const handleStorageSync = (event) => {
-  if (event.key !== 'poetry-competition-state') {
+  if (event.key !== storage.SCREEN_STORAGE_KEY) {
     return
   }
 
-  applyState(storage.load())
+  applyState(storage.loadScreen())
 }
 
 onMounted(() => {
