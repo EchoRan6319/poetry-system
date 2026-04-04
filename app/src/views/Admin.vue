@@ -89,9 +89,13 @@
             <div class="flex gap-3">
               <button
                 @click="syncToScreen"
-                :disabled="!currentQuestion"
-                :class="syncButtonClass"
-                class="flex-1 disabled:cursor-not-allowed disabled:opacity-50"
+                :disabled="!currentQuestion || isCurrentQuestionSynced"
+                :class="[
+                  'flex-1 rounded-lg px-6 py-3 font-semibold transition-all duration-200',
+                  isCurrentQuestionSynced
+                    ? 'bg-gray-400 text-gray-600 cursor-not-allowed opacity-70'
+                    : 'btn-primary'
+                ]"
               >
                 {{ syncButtonLabel }}
               </button>
@@ -319,7 +323,7 @@ const isCurrentQuestionSynced = computed(() => {
 })
 
 const syncButtonClass = computed(() => {
-  return isCurrentQuestionSynced.value ? 'btn-primary-active' : 'btn-primary'
+  return isCurrentQuestionSynced.value ? 'btn-synced' : 'btn-primary'
 })
 
 const syncButtonLabel = computed(() => {
@@ -458,6 +462,10 @@ const questionCardClass = (question) => {
 const syncToScreen = () => {
   if (!currentQuestion.value) return
 
+  const questionData = JSON.parse(JSON.stringify(currentQuestion.value))
+  const teamsData = JSON.parse(JSON.stringify(teams.value))
+  const timerData = JSON.parse(JSON.stringify(timer.value))
+
   screenState.value = {
     ...screenState.value,
     currentQuestion: currentQuestion.value,
@@ -469,19 +477,11 @@ const syncToScreen = () => {
   }
 
   poetryChannel.syncQuestion({
-    ...currentQuestion.value,
+    ...questionData,
     index: currentQuestionIndex.value
   })
   poetryChannel.changeStage(currentQuestion.value.stage)
-  screenState.value = {
-    ...screenState.value,
-    teams: [...teams.value]
-  }
-  screenState.value = {
-    ...screenState.value,
-    teams: [...teams.value]
-  }
-  poetryChannel.updateTeams([...teams.value])
+  poetryChannel.updateTeams(teamsData)
   syncedQuestionId.value = currentQuestion.value.id
   saveAdminState()
   saveScreenState()
@@ -580,7 +580,7 @@ const addTeam = () => {
     ...screenState.value,
     teams: [...teams.value]
   }
-  poetryChannel.updateTeams([...teams.value])
+  poetryChannel.updateTeams(JSON.parse(JSON.stringify(teams.value)))
   saveAdminState()
   saveScreenState()
 }
@@ -592,7 +592,7 @@ const removeTeam = () => {
     ...screenState.value,
     teams: [...teams.value]
   }
-  poetryChannel.updateTeams([...teams.value])
+  poetryChannel.updateTeams(JSON.parse(JSON.stringify(teams.value)))
   saveAdminState()
   saveScreenState()
 }

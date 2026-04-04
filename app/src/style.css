@@ -377,6 +377,14 @@
     filter: brightness(1.03);
   }
 
+  .btn-synced {
+    @apply rounded-lg px-6 py-3 font-semibold text-ink-soft;
+    background: linear-gradient(135deg, #a8a8a8, #c4c4c4);
+    box-shadow: none;
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+
   .btn-gold {
     @apply rounded-lg px-6 py-3 font-semibold text-paper-soft transition-all duration-200;
     background: linear-gradient(135deg, #8f5d27, #c89a4f);
