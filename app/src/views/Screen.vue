@@ -48,7 +48,7 @@
             </div>
 
             <div v-else-if="currentQuestion.stage === '宫格寻诗'" class="text-center">
-              <div class="mx-auto grid max-w-5xl grid-cols-6 gap-4">
+              <div class="mx-auto grid w-fit grid-cols-5 gap-4">
                 <div
                   v-for="(char, index) in gridChars"
                   :key="`${char}-${index}`"
@@ -177,7 +177,14 @@ const gridChars = computed(() => {
     ? text.split(' ').filter((item) => item.trim())
     : text.split('')
 
-  return [...chars].sort(() => Math.random() - 0.5)
+  const shuffledChars = [...chars].sort(() => Math.random() - 0.5)
+  const fixedGridSize = 15
+
+  if (shuffledChars.length >= fixedGridSize) {
+    return shuffledChars.slice(0, fixedGridSize)
+  }
+
+  return [...shuffledChars, ...Array.from({ length: fixedGridSize - shuffledChars.length }, () => '')]
 })
 
 const formatTime = (seconds) => {
