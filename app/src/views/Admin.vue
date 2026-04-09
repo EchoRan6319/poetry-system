@@ -167,14 +167,14 @@
             <div class="flex gap-2">
               <button
                 @click="addTeam"
-                :disabled="teams.length >= 12"
+                :disabled="teams.length >= 30"
                 class="rounded bg-green px-3 py-1 text-sm text-paper-soft transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 + 添加
               </button>
               <button
                 @click="removeTeam"
-                :disabled="teams.length <= 2"
+                :disabled="teams.length <= 1"
                 class="rounded bg-red px-3 py-1 text-sm text-paper-soft transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 - 减少
@@ -567,12 +567,16 @@ const updateScore = (teamId, delta) => {
 }
 
 const addTeam = () => {
-  if (teams.value.length >= 12) return
+  if (teams.value.length >= 30) return
 
   const nextIndex = teams.value.length + 1
+  const teamName = window.prompt(`请输入第 ${nextIndex} 支队伍的名称：`, `队伍${nextIndex}`)
+  if (teamName === null) return
+
+  const finalName = teamName.trim() || `队伍${nextIndex}`
   teams.value.push({
     id: `team${nextIndex}`,
-    name: `队伍${nextIndex}`,
+    name: finalName,
     score: 0
   })
 

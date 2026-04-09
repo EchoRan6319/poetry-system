@@ -2,17 +2,9 @@ const ADMIN_STORAGE_KEY = 'poetry-competition-admin-state'
 const SCREEN_STORAGE_KEY = 'poetry-competition-screen-state'
 
 const defaultTeams = [
-  { id: 'team1', name: '财经与金融管理学院', score: 0 },
-  { id: 'team2', name: '电子商务学院', score: 0 },
-  { id: 'team3', name: '轨道交通工程学院', score: 0 },
-  { id: 'team4', name: '建筑与环境工程学院', score: 0 },
-  { id: 'team5', name: '生命健康学院', score: 0 },
-  { id: 'team6', name: '文化创意学院', score: 0 },
-  { id: 'team7', name: '新材料工程学院', score: 0 },
-  { id: 'team8', name: '新能源汽车学院', score: 0 },
-  { id: 'team9', name: '信息工程与大数据学院', score: 0 },
-  { id: 'team10', name: '智能制造学院', score: 0 },
-  { id: 'team11', name: '自动化与物联网学院', score: 0 }
+  { id: 'team1', name: '队伍1', score: 0 },
+  { id: 'team2', name: '队伍2', score: 0 },
+  { id: 'team3', name: '队伍3', score: 0 }
 ]
 
 const defaultState = {
