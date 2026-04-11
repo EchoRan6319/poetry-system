@@ -273,7 +273,7 @@
             </div>
             <div class="flex items-center justify-between gap-3">
               <span class="text-ink-soft">下一题</span>
-              <kbd class="rounded-md border border-gold/30 bg-gold/10 px-2 py-1 text-xs font-semibold text-gold">ArrowRight</kbd>
+              <kbd class="rounded-md border border-gold/30 bg-gold/10 px-2 py-1 text-xs font-semibold text-gold">→</kbd>
             </div>
             <div class="flex items-center justify-between gap-3">
               <span class="text-ink-soft">同步到大屏</span>
@@ -306,6 +306,7 @@ const timer = ref({
   endAt: null
 })
 const teams = ref([])
+const scoreHistory = ref({})
 
 let timerInterval = null
 let unsubscribeList = []
@@ -360,7 +361,8 @@ const saveAdminState = () => {
     currentStage: currentStage.value,
     teams: teams.value,
     timer: timer.value,
-    isAnswerRevealed: isAnswerRevealed.value
+    isAnswerRevealed: isAnswerRevealed.value,
+    scoreHistory: scoreHistory.value
   })
 }
 
@@ -415,6 +417,7 @@ const applyState = (state) => {
   teams.value = state.teams && state.teams.length > 0 ? state.teams : storage.getDefaultTeams()
   timer.value = state.timer || getDefaultTimer()
   isAnswerRevealed.value = Boolean(state.isAnswerRevealed)
+  scoreHistory.value = state.scoreHistory || {}
   startLocalTimer()
 }
 
@@ -559,7 +562,13 @@ const updateScore = (teamId, delta) => {
   const team = teams.value.find((item) => item.id === teamId)
   if (!team) return
 
-  team.score = Math.max(0, team.score + delta)
+  team.score = team.score + delta
+  if (!scoreHistory.value[teamId]) {
+    scoreHistory.value[teamId] = []
+  }
+  const now = new Date()
+  const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`
+  scoreHistory.value[teamId].push({ time: timeStr, delta })
   screenState.value = {
     ...screenState.value,
     teams: [...teams.value]
@@ -630,6 +639,7 @@ const resetGame = () => {
     ...team,
     score: 0
   }))
+  scoreHistory.value = {}
   screenState.value = storage.getDefaultState()
   screenState.value.teams = [...teams.value]
   poetryChannel.resetGame()
@@ -648,26 +658,30 @@ const exportCompetitionRecord = () => {
     return `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}_${pad(date.getHours())}${pad(date.getMinutes())}${pad(date.getSeconds())}`
   }
 
+  const formatExportTime = (date) => {
+    const pad = (n) => String(n).padStart(2, '0')
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`
+  }
+
   const teamsSection = teams.value.length > 0
-    ? teams.value.map((team, index) => `${index + 1}. ${team.name}: ${team.score} 分`).join('\n')
+    ? teams.value.map((team, index) => {
+        const history = scoreHistory.value[team.id] || []
+        const historyLines = history.length > 0
+          ? history.map(h => `   - ${h.time} ${h.delta > 0 ? '+' : ''}${h.delta}分`).join('\n')
+          : '   (无加分记录)'
+        return `${index + 1}. ${team.name}: ${team.score} 分\n${historyLines}`
+      }).join('\n')
     : '暂无数据'
 
-  const questionsSection = questions.value.length > 0
-    ? questions.value.map((q, index) => {
-        const isAnswered = syncedQuestionId.value === q.id && isAnswerRevealed.value
-        return `[第 ${index + 1} 题] 题型：${q.stage}\n题目：${q.question}\n答案：${q.answer}\n状态：${isAnswered ? '已揭晓' : '未揭晓'}`
-      }).join('\n\n')
-    : '暂无数据'
+  const exportTime = formatExportTime(new Date())
 
   const content = `========================================
         诗词大赛 - 比赛记录
 ========================================
+导出时间：${exportTime}
 
 --- 队伍得分 ---
 ${teamsSection}
-
---- 题目记录 ---
-${questionsSection}
 `
 
   const blob = new Blob([content], { type: 'text/plain;charset=utf-8' })

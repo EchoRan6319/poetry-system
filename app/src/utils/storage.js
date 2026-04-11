@@ -33,7 +33,7 @@ const normalizeTeams = (teams) => {
   return teams.map((team, index) => ({
     id: team?.id || `team${index + 1}`,
     name: team?.name || `队伍${index + 1}`,
-    score: Math.max(0, Number(team?.score) || 0)
+    score: Number(team?.score) || 0
   }))
 }
 
