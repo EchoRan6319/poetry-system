@@ -147,7 +147,7 @@
 
           <div>
             <h3 class="mb-3 text-sm font-medium text-ink-soft">系统控制</h3>
-            <div class="flex gap-3">
+            <div class="flex flex-wrap gap-3">
               <button @click="resetScores" class="flex-1 rounded-lg bg-paper-soft px-4 py-2 text-sm text-ink transition-colors hover:bg-white">
                 重置分数
               </button>
@@ -156,6 +156,9 @@
               </button>
               <button @click="clearStorage" class="flex-1 rounded-lg bg-paper-soft px-4 py-2 text-sm text-ink transition-colors hover:bg-white">
                 清除缓存
+              </button>
+              <button @click="exportCompetitionRecord" class="flex-1 rounded-lg bg-green/10 px-4 py-2 text-sm text-green transition-colors hover:bg-green/20">
+                导出记录
               </button>
             </div>
           </div>
@@ -637,6 +640,45 @@ const resetGame = () => {
 const clearStorage = () => {
   storage.clear()
   location.reload()
+}
+
+const exportCompetitionRecord = () => {
+  const formatDate = (date) => {
+    const pad = (n) => String(n).padStart(2, '0')
+    return `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}_${pad(date.getHours())}${pad(date.getMinutes())}${pad(date.getSeconds())}`
+  }
+
+  const teamsSection = teams.value.length > 0
+    ? teams.value.map((team, index) => `${index + 1}. ${team.name}: ${team.score} 分`).join('\n')
+    : '暂无数据'
+
+  const questionsSection = questions.value.length > 0
+    ? questions.value.map((q, index) => {
+        const isAnswered = syncedQuestionId.value === q.id && isAnswerRevealed.value
+        return `[第 ${index + 1} 题] 题型：${q.stage}\n题目：${q.question}\n答案：${q.answer}\n状态：${isAnswered ? '已揭晓' : '未揭晓'}`
+      }).join('\n\n')
+    : '暂无数据'
+
+  const content = `========================================
+        诗词大赛 - 比赛记录
+========================================
+
+--- 队伍得分 ---
+${teamsSection}
+
+--- 题目记录 ---
+${questionsSection}
+`
+
+  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = `诗词大赛记录_${formatDate(new Date())}.txt`
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  URL.revokeObjectURL(url)
 }
 
 const restoreState = () => {
