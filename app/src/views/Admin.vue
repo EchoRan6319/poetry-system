@@ -283,6 +283,14 @@
         </div>
       </div>
     </div>
+    
+    <!-- 隐蔽的版权声明：右侧边缘垂直排版，极低透明度，悬浮显示 -->
+    <div 
+      class="fixed right-3 top-1/2 -translate-y-1/2 z-0 select-none cursor-default font-serif text-[11px] tracking-[0.4em] text-ink-soft/15 transition-all duration-1000 hover:text-ink-soft/80"
+      style="writing-mode: vertical-rl; text-orientation: mixed;"
+    >
+      Copyright © 2026 申浩然 保留所有权利
+    </div>
   </div>
 </template>
 

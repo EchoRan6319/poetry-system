@@ -125,6 +125,14 @@
       </div>
     </footer>
 
+    <!-- 隐蔽的版权声明：右侧边缘垂直排版，极低透明度，悬浮显示 -->
+    <div 
+      class="fixed right-3 top-1/2 -translate-y-1/2 z-0 select-none cursor-default font-serif text-[11px] tracking-[0.4em] text-ink-soft/15 transition-all duration-1000 hover:text-ink-soft/80"
+      style="writing-mode: vertical-rl; text-orientation: mixed;"
+    >
+      Copyright © 2026 申浩然 保留所有权利
+    </div>
+
     <div class="fixed right-6 top-6 z-50">
       <div class="h-3 w-3 rounded-full" :class="isConnected ? 'bg-green animate-breathe' : 'bg-gold'"></div>
     </div>
@@ -141,6 +149,7 @@ const currentQuestion = ref(null)
 const currentStage = ref('')
 const isAnswerRevealed = ref(false)
 const teamScrollRef = ref(null)
+const isAtBottom = ref(false)
 const timer = ref({
   isRunning: false,
   remaining: 0,
@@ -152,6 +161,13 @@ const teams = ref([])
 let timerInterval = null
 let heartbeatInterval = null
 let unsubscribeList = []
+
+const handleScroll = () => {
+  const scrollTop = window.scrollY || document.documentElement.scrollTop
+  const scrollHeight = document.documentElement.scrollHeight
+  const clientHeight = document.documentElement.clientHeight
+  isAtBottom.value = scrollTop + clientHeight >= scrollHeight - 10
+}
 
 const getDefaultTimer = (seconds = 0) => ({
   isRunning: false,
@@ -350,6 +366,8 @@ onMounted(() => {
   }, 5000)
 
   window.addEventListener('storage', handleStorageSync)
+  window.addEventListener('scroll', handleScroll)
+  handleScroll()
 })
 
 onUnmounted(() => {
@@ -360,6 +378,7 @@ onUnmounted(() => {
   unsubscribeList.forEach((unsubscribe) => unsubscribe())
   poetryChannel.close()
   window.removeEventListener('storage', handleStorageSync)
+  window.removeEventListener('scroll', handleScroll)
 })
 </script>
 
