@@ -167,7 +167,17 @@
         <div class="glass-card p-6">
           <div class="mb-4 flex items-center justify-between">
             <h2 class="text-lg font-semibold text-green">队伍管理</h2>
-            <div class="flex gap-2">
+            <div class="flex items-center gap-2">
+              <select
+                v-model="sortMode"
+                @change="applySort"
+                class="rounded border border-gold/30 bg-paper-soft px-2 py-1 text-sm text-ink-strong outline-none focus:border-gold"
+              >
+                <option value="default">默认顺序</option>
+                <option value="score-desc">分数从高到低</option>
+                <option value="score-asc">分数从低到高</option>
+                <option value="name">队名排序</option>
+              </select>
               <button
                 @click="addTeam"
                 :disabled="teams.length >= 30"
@@ -186,10 +196,14 @@
           </div>
 
           <div class="max-h-[400px] space-y-3 overflow-y-auto">
-            <div v-for="(team, index) in teams" :key="team.id" class="glass-card p-3">
+            <div v-for="(team, index) in sortedTeams" :key="team.id" class="glass-card p-3">
               <div class="flex items-center gap-3">
                 <span class="w-8 text-ink-soft">{{ index + 1 }}.</span>
-                <span class="flex-1 text-sm text-ink-strong">{{ team.name }}</span>
+                <span
+                  class="flex-1 cursor-pointer text-sm text-ink-strong underline decoration-gold/30 underline-offset-2 transition-colors hover:text-gold hover:decoration-gold"
+                  @click="renameTeam(team.id)"
+                  title="点击修改队名"
+                >{{ team.name }}</span>
                 <div class="flex gap-2">
                   <button
                     @click="updateScore(team.id, -10)"
@@ -221,7 +235,7 @@
         <div class="glass-card p-4">
           <h2 class="mb-4 text-lg font-semibold text-green">实时计分</h2>
           <div class="max-h-[300px] space-y-3 overflow-y-auto">
-            <div v-for="team in teams" :key="team.id" class="glass-card p-3">
+            <div v-for="team in sortedTeams" :key="team.id" class="glass-card p-3">
               <div class="flex items-center justify-between">
                 <span class="font-medium text-ink-strong">{{ team.name }}</span>
                 <span class="data-number text-2xl font-bold text-gold">{{ team.score }}</span>
@@ -315,6 +329,7 @@ const timer = ref({
 })
 const teams = ref([])
 const scoreHistory = ref({})
+const sortMode = ref('default')
 
 let timerInterval = null
 let unsubscribeList = []
@@ -353,6 +368,32 @@ const displayQuestionProgress = computed(() => {
 
   return `${currentQuestionIndex.value + 1} / ${questions.value.length}`
 })
+
+const sortedTeams = computed(() => {
+  const arr = teams.value.slice()
+  switch (sortMode.value) {
+    case 'score-desc':
+      return arr.sort((a, b) => b.score - a.score)
+    case 'score-asc':
+      return arr.sort((a, b) => a.score - b.score)
+    case 'name':
+      return arr.sort((a, b) => a.name.localeCompare(b.name, 'zh-CN'))
+    default:
+      return arr
+  }
+})
+
+const applySort = () => {
+  const sorted = sortedTeams.value
+  teams.value = sorted
+  screenState.value = {
+    ...screenState.value,
+    teams: [...teams.value]
+  }
+  poetryChannel.updateTeams(JSON.parse(JSON.stringify(teams.value)))
+  saveAdminState()
+  saveScreenState()
+}
 
 const formatTime = (seconds) => {
   const safeSeconds = Math.max(0, Number(seconds) || 0)
@@ -609,6 +650,26 @@ const addTeam = () => {
   saveScreenState()
 }
 
+const renameTeam = (teamId) => {
+  const team = teams.value.find((item) => item.id === teamId)
+  if (!team) return
+
+  const newName = window.prompt(`请输入新队名：`, team.name)
+  if (newName === null) return
+
+  const finalName = newName.trim() || team.name
+  if (finalName === team.name) return
+
+  team.name = finalName
+  screenState.value = {
+    ...screenState.value,
+    teams: [...teams.value]
+  }
+  poetryChannel.updateTeams(JSON.parse(JSON.stringify(teams.value)))
+  saveAdminState()
+  saveScreenState()
+}
+
 const removeTeam = () => {
   if (teams.value.length <= 2) return
   teams.value.pop()
@@ -671,8 +732,8 @@ const exportCompetitionRecord = () => {
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`
   }
 
-  const teamsSection = teams.value.length > 0
-    ? teams.value.map((team, index) => {
+  const teamsSection = sortedTeams.value.length > 0
+    ? sortedTeams.value.map((team, index) => {
         const history = scoreHistory.value[team.id] || []
         const historyLines = history.length > 0
           ? history.map(h => `   - ${h.time} ${h.delta > 0 ? '+' : ''}${h.delta}分`).join('\n')

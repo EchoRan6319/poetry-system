@@ -193,14 +193,47 @@ const gridChars = computed(() => {
     ? text.split(' ').filter((item) => item.trim())
     : text.split('')
 
-  const shuffledChars = [...chars].sort(() => Math.random() - 0.5)
-  const fixedGridSize = 15
+  const answerText = currentQuestion.value.answer || ''
+  const answerChars = answerText.replace(/[，。\/]/g, '').replace(/\s/g, '').split('')
 
-  if (shuffledChars.length >= fixedGridSize) {
-    return shuffledChars.slice(0, fixedGridSize)
+  const fixedGridSize = 15
+  const allChars = chars.slice(0, fixedGridSize)
+
+  // Separate answer chars and distractor chars
+  const answerSet = new Set(answerChars)
+  const answerPool = allChars.filter((c) => answerSet.has(c))
+  const distractorPool = allChars.filter((c) => !answerSet.has(c))
+
+  // Shuffle both pools
+  const shuffledAnswers = [...answerPool].sort(() => Math.random() - 0.5)
+  const shuffledDistractors = [...distractorPool].sort(() => Math.random() - 0.5)
+
+  // Distribute answer chars evenly across 15 positions
+  const result = Array(fixedGridSize).fill(null)
+  const answerPositions = []
+
+  // Calculate evenly spaced positions for answer chars
+  const total = fixedGridSize
+  const count = shuffledAnswers.length
+  for (let i = 0; i < count; i++) {
+    const pos = Math.round((i * (total - 1)) / (count - 1))
+    answerPositions.push(pos)
   }
 
-  return [...shuffledChars, ...Array.from({ length: fixedGridSize - shuffledChars.length }, () => '')]
+  // Fill answer chars at calculated positions
+  for (let i = 0; i < shuffledAnswers.length; i++) {
+    result[answerPositions[i]] = shuffledAnswers[i]
+  }
+
+  // Fill distractor chars in remaining positions
+  let distractorIndex = 0
+  for (let i = 0; i < fixedGridSize; i++) {
+    if (result[i] === null && distractorIndex < shuffledDistractors.length) {
+      result[i] = shuffledDistractors[distractorIndex++]
+    }
+  }
+
+  return result
 })
 
 const formatTime = (seconds) => {
