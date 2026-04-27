@@ -25,7 +25,7 @@
       </div>
     </header>
 
-    <main class="flex min-h-screen flex-col justify-center px-12 pb-24 pt-28">
+    <main class="flex min-h-screen flex-col justify-center px-4 pb-24 pt-28">
       <div class="flex flex-1 items-center justify-center">
         <div v-if="!currentQuestion" class="text-center">
           <div class="mb-8 text-8xl text-gold">待命</div>
@@ -33,26 +33,26 @@
           <p class="text-2xl text-ink-soft">请使用导播控制台同步题目</p>
         </div>
 
-        <div v-else class="w-full max-w-6xl">
+        <div v-else class="w-full max-w-[90vw]">
           <div class="mb-6 text-center">
             <span class="glass-card inline-block px-6 py-2 text-lg text-green">
               {{ currentQuestion.rule }}
             </span>
           </div>
 
-          <div class="glass-card mb-6 p-10">
+          <div class="glass-card mb-6 p-6 md:p-10">
             <div v-if="currentQuestion.stage === 'Emoji 猜诗'" class="text-center">
-              <div class="font-emoji text-[120px] leading-tight tracking-wider">
+              <div class="font-emoji text-[clamp(3rem,10vw,8rem)] leading-tight tracking-wider">
                 {{ currentQuestion.question }}
               </div>
             </div>
 
             <div v-else-if="currentQuestion.stage === '宫格寻诗'" class="text-center">
-              <div class="mx-auto grid w-fit grid-cols-5 gap-4">
+              <div class="mx-auto grid w-fit grid-cols-5 gap-3 md:gap-4">
                 <div
                   v-for="(char, index) in gridChars"
                   :key="`${char}-${index}`"
-                  class="glass-card flex h-20 w-20 items-center justify-center border-2 border-gold/25 text-5xl text-ink-strong transition-colors hover:border-green/40"
+                  class="glass-card flex h-16 w-16 md:h-20 md:w-20 items-center justify-center border-2 border-gold/25 text-4xl md:text-5xl text-ink-strong transition-colors hover:border-green/40"
                 >
                   {{ char }}
                 </div>
@@ -60,33 +60,33 @@
             </div>
 
             <div v-else-if="currentQuestion.stage === '易错找茬'" class="text-center">
-              <div class="text-6xl leading-relaxed text-ink-strong">
+              <div class="text-[clamp(2rem,5vw,4rem)] leading-relaxed text-ink-strong">
                 {{ currentQuestion.question }}
               </div>
               <div class="mt-8 text-2xl text-green">请找出其中的错别字</div>
             </div>
 
             <div v-else-if="currentQuestion.stage === '中原风华'" class="text-center">
-              <div class="text-5xl leading-relaxed text-ink-strong">
+              <div class="text-[clamp(1.5rem,4vw,3rem)] leading-relaxed text-ink-strong">
                 {{ currentQuestion.question }}
               </div>
             </div>
 
             <div v-else-if="currentQuestion.stage === '经典填词'" class="text-center">
-              <div class="text-6xl leading-relaxed tracking-widest text-ink-strong">
+              <div class="text-[clamp(2rem,5vw,4rem)] leading-relaxed tracking-widest text-ink-strong">
                 {{ currentQuestion.question }}
               </div>
             </div>
 
             <div v-else-if="currentQuestion.stage === '主题飞花令'" class="text-center">
               <div class="mb-8 text-4xl text-green">主题</div>
-              <div class="text-8xl font-bold text-gold-gradient">
+              <div class="text-[clamp(4rem,12vw,8rem)] font-bold text-gold-gradient">
                 {{ currentQuestion.question }}
               </div>
             </div>
 
             <div v-else class="text-center">
-              <div class="text-6xl leading-relaxed text-ink-strong">
+              <div class="text-[clamp(2rem,5vw,4rem)] leading-relaxed text-ink-strong">
                 {{ currentQuestion.question }}
               </div>
             </div>
@@ -95,7 +95,7 @@
           <div v-if="isAnswerRevealed" class="glass-card border-gold/30 bg-gold/10 p-6">
             <div class="text-center">
               <div class="mb-2 text-sm text-gold">正确答案</div>
-              <div class="text-5xl text-gold-gradient">
+              <div class="text-[clamp(2rem,5vw,3rem)] text-gold-gradient">
                 {{ currentQuestion.answer }}
               </div>
             </div>
