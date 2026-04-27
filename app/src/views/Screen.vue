@@ -12,9 +12,7 @@
           </div>
         </div>
 
-        <div class="glass-card px-12 py-4">
-          <span class="text-2xl font-semibold text-green">{{ currentStage || '准备就绪' }}</span>
-        </div>
+
 
         <div class="glass-card min-w-[220px] px-8 py-4 text-center">
           <div class="mb-1 text-sm text-ink-soft">剩余时间</div>
@@ -35,9 +33,10 @@
 
         <div v-else class="w-full max-w-[90vw]">
           <div class="mb-6 text-center">
-            <span class="glass-card inline-block px-6 py-2 text-lg text-green">
-              {{ currentQuestion.rule }}
-            </span>
+            <div class="glass-card inline-flex flex-col items-center gap-1 px-6 py-3">
+              <span class="text-xl font-semibold text-green">{{ currentStage || '准备就绪' }}</span>
+              <span class="text-base text-ink-soft">{{ currentQuestion.rule }}</span>
+            </div>
           </div>
 
           <div class="glass-card mb-6 p-6 md:p-10">
